@@ -14,9 +14,16 @@ import (
 	"strings"
 )
 
-// Generate mp3 file for provided ssml file
-// AWS configuration files:
-// - ~/.aws/
+// Generate text-to-speech encoding of input file
+// Pass file to encode as command line argument
+// - example: ./polly mytext.xml
+// The following file extensions are currently compatible:
+// - .txt for plaintext
+// - .xml for speech synthesis markup language
+// Returns a synthesis of text in the following possible file types
+// - .mp3
+// - .ogg
+// - .pcm
 func main() {
 	cfgInit()
 	if len(os.Args) != 2 {
@@ -28,20 +35,28 @@ func main() {
 	}
 
 	s := string(contents[:])
+	names := strings.Split(os.Args[1], ".")
 
 	sess := session.Must(session.NewSessionWithOptions(session.Options{
 		SharedConfigState: session.SharedConfigEnable}))
 	p := polly.New(sess)
+
 	input := &polly.SynthesizeSpeechInput{OutputFormat: aws.String("mp3"),
-		TextType: aws.String("ssml"), Text: aws.String(s), VoiceId: aws.String(viper.GetString("voice"))}
+		Text: aws.String(s), VoiceId: aws.String(viper.GetString("voice"))}
+
+	switch names[1] {
+	case "txt":
+		input.SetTextType("text")
+	case "xml":
+		input.SetTextType("ssml")
+	}
 
 	output, err := p.SynthesizeSpeech(input)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	names := strings.Split(os.Args[1], ".")
-	mp3File := names[0] + ".mp3"
+	mp3File := names[0] + viper.GetString("output")
 	outFile, err := os.Create(mp3File)
 	if err != nil {
 		log.Fatal(err)
