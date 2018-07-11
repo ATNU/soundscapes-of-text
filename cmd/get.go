@@ -10,8 +10,8 @@ func init() {
 
 var getCmd = &cobra.Command{
 	Use:   "get",
-	Short: "Gets all available voices",
-	Long:  `The current version of Polly you are running`,
+	Short: "Get [type]",
+	Long:  `Get can be used to retrieve AWS Polly supported assets`,
 	Run: func(cmd *cobra.Command, args []string) {
 	},
 }

@@ -14,7 +14,7 @@ func init() {
 var getLexiconsCmd = &cobra.Command{
 	Use:   "lexicons",
 	Short: "Gets all available lexicons",
-	Long:  `The current version of Polly you are running`,
+	Long:  `Get all available lexicons`,
 	Run: func(cmd *cobra.Command, args []string) {
 		GetLexicons()
 	},

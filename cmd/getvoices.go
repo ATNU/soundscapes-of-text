@@ -14,20 +14,20 @@ func init() {
 
 var getVoicesCmd = &cobra.Command{
 	Use:   "voices",
-	Short: "Gets all available voices",
-	Long:  `The current version of Polly you are running`,
+	Short: "get [languageCode]",
+	Long:  `Gets all available voices for specified language code`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) == 0 {
 			log.Fatal("Please provide a Language Code")
 		}
-		GetVoices(args[0])
+		LogVoices(args[0])
 	},
 }
 
 // GetVoices returns available AWS voices for specified language code
 // Parameters:
 // - string language code
-func GetVoices(lan string) {
+func GetVoices(lan string) *polly.DescribeVoicesOutput {
 	sess := session.Must(session.NewSessionWithOptions(session.Options{
 		SharedConfigState: session.SharedConfigEnable}))
 
@@ -41,6 +41,12 @@ func GetVoices(lan string) {
 	if err != nil {
 		log.Fatal(err)
 	}
+	return result
+}
 
-	log.Println(result)
+// LogVoices returns available AWS voices for specified language code
+// Parameters:
+// - string language code
+func LogVoices(lan string) {
+	log.Println(GetVoices(lan))
 }

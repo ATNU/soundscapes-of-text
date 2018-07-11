@@ -21,7 +21,7 @@ func init() {
 
 // Initialise viper
 func initConfig() {
-	viper.SetConfigName("cobra")
+	viper.SetConfigName(".cobra")
 	viper.AddConfigPath(".")
 	err := viper.ReadInConfig()
 	if err != nil {

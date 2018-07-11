@@ -1,0 +1,13 @@
+{
+    "voice": "Justin",
+    "input": "sample-text.xml",
+    "outputtype": "mp3",
+    "assets": {
+        "demoPath": "assets/demo",
+        "ttsPath": "assets/tts",
+        "tagsPath": "assets/tag"
+    },
+    "webserver": {
+        "clientAddr": "http://localhost:4200"
+    }
+}

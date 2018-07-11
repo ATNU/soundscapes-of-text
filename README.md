@@ -58,6 +58,11 @@ This is useful when fine-tuning an SSML file.
 Caution as this may impede on AWS tier usage.
 
 ```sh
+$ ./polly webserver
+```
+Starts a HTTP server
+
+```sh
 $ ./polly get
 ```
 A number of AWS Polly availabilities may be retrieved from the get command.
@@ -69,8 +74,10 @@ A basic configuration file is provided
 | Option      | Description                                                              |
 | ----------- | ------------------------------------------------------------------------ |
 | voice       | AWS Polly has a number of available voices to choose from.               |
-| input       | Input filepath |
+| input       | Input filepath                                                           |
 | outputtype  | Encoding output format:<ul><li>.mp3</li><li>.off3</li><li>.pcm</li></ul> |
+| assets      | Asset Paths:<ul><li>demoPath</li><li>ttsPath</li></ul>                   |
+
 
 [AWS Polly]: https://aws.amazon.com/polly/
 [go]: https://golang.org/
