@@ -1,13 +1,28 @@
 {
     "voice": "Justin",
     "input": "sample-text.xml",
-    "outputtype": "mp3",
+    "outputType": "mp3",
     "assets": {
         "demoPath": "assets/demo",
         "ttsPath": "assets/tts",
         "tagsPath": "assets/tag"
     },
     "webserver": {
-        "clientAddr": "http://localhost:4200"
+        "addr": "0.0.0.0:8080",
+        "clientAddr": "http://localhost:4200",
+        "timeout": {
+            "write": 15,
+            "read": 15,
+            "idle": 60,
+            "cancel": 60 
+        }
+    },
+    "s3": {
+        "bucketName": "uk.ac.ncl.atnu.sot.output",
+        "outputFormat": "mp3",
+        "maxRetryCount": 10
+    },
+    "sns": {
+        "pollyTopicName": "arn:aws:sns:us-west-2:438791141487:polly"
     }
 }

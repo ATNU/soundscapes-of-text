@@ -17,21 +17,24 @@ var serveCmd = &cobra.Command{
 	Long: `Serve watches for any file changes and generates a new tts encoding at the point of file change.
 WARNING, may be costly as generating new tts encodings often `,
 	Run: func(cmd *cobra.Command, args []string) {
-		Serve()
+		err := Serve()
+		if err != nil {
+			log.Println(err)
+		}
 	},
 }
 
 // Serve starts a listener on the input text, and generates a new
 // TTS encoding at the point the file is modified
-func Serve() {
+func Serve() error {
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	defer watcher.Close()
 
 	if err := watcher.Add(viper.GetString("input")); err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	done := make(chan bool)
@@ -47,4 +50,5 @@ func Serve() {
 		}
 	}()
 	<-done
+	return nil
 }

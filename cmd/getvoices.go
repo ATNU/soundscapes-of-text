@@ -24,10 +24,12 @@ var getVoicesCmd = &cobra.Command{
 	},
 }
 
-// GetVoices returns available AWS voices for specified language code
+// GetVoices retrieved available AWS voices for specified language code
 // Parameters:
 // - string language code
-func GetVoices(lan string) *polly.DescribeVoicesOutput {
+//
+// Returns a DescribeVoicesOutput containing all voices, and any errors generated
+func GetVoices(lan string) (*polly.DescribeVoicesOutput, error) {
 	sess := session.Must(session.NewSessionWithOptions(session.Options{
 		SharedConfigState: session.SharedConfigEnable}))
 
@@ -39,9 +41,9 @@ func GetVoices(lan string) *polly.DescribeVoicesOutput {
 
 	result, err := p.DescribeVoices(input)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
-	return result
+	return result, err
 }
 
 // LogVoices returns available AWS voices for specified language code

@@ -26,16 +26,15 @@ var getTagsCmd = &cobra.Command{
 	Short: "Gets all available tags",
 	Long:  `Get all available tags `,
 	Run: func(cmd *cobra.Command, args []string) {
-		GetTags()
+		log.Println(GetTags())
 	},
 }
 
 // GetTags retreives all defined tags from persistant memory store
-func GetTags() {
+func GetTags() ([]Tag, error) {
 	dir, err := ioutil.ReadDir(viper.GetString("assets.tagsPath"))
 	if err != nil {
-		log.Println(err)
-		return
+		return nil, err
 	}
 
 	ts := make([]Tag, 0)
@@ -50,5 +49,5 @@ func GetTags() {
 		enc.Decode(&t)
 		ts = append(ts, t)
 	}
-	log.Println(ts)
+	return ts, err
 }
