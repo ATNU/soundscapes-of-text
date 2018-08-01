@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/MattNolf/polly.svg?branch=master)](https://travis-ci.org/MattNolf/polly)
+
 # Polly
 
 Go Binary that generates text-to-speech using [AWS Polly]
