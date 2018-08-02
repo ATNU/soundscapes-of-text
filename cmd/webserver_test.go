@@ -31,7 +31,7 @@ func TestHandleTags(t *testing.T) {
 // TestHandleVoice asserts that get requests to AWS return successfully
 func TestHandleVoices(t *testing.T) {
 	InitConfig()
-	c := []struct {
+	tt := []struct {
 		routeVariable string
 		shouldPass    bool
 	}{
@@ -63,8 +63,8 @@ func TestHandleVoices(t *testing.T) {
 		{"bla-bla", false},
 	}
 
-	for _, val := range c {
-		path := fmt.Sprintf("/voices/%s", val.routeVariable)
+	for _, tc := range tt {
+		path := fmt.Sprintf("/voices/%s", tc.routeVariable)
 		req, err := http.NewRequest("GET", path, nil)
 		if err != nil {
 			t.Fatal(err)
@@ -75,14 +75,14 @@ func TestHandleVoices(t *testing.T) {
 		r.HandleFunc("/voices/{voice}", cmd.HandleVoices)
 		r.ServeHTTP(rec, req)
 
-		if rec.Code != http.StatusOK && val.shouldPass {
+		if rec.Code != http.StatusOK && tc.shouldPass {
 			t.Errorf("handler on routeVariable %s: got %v want %v",
-				val.routeVariable, rec.Code, http.StatusOK)
+				tc.routeVariable, rec.Code, http.StatusOK)
 		}
 
-		if rec.Code == http.StatusOK && !val.shouldPass {
+		if rec.Code == http.StatusOK && !tc.shouldPass {
 			t.Errorf("handler on routeVariable %s: got %v want %v",
-				val.routeVariable, rec.Code, http.StatusInternalServerError)
+				tc.routeVariable, rec.Code, http.StatusInternalServerError)
 		}
 	}
 
