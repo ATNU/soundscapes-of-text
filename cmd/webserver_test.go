@@ -64,35 +64,36 @@ func TestHandleVoices(t *testing.T) {
 	}
 
 	for _, tc := range tt {
-		path := fmt.Sprintf("/voices/%s", tc.routeVariable)
-		req, err := http.NewRequest("GET", path, nil)
-		if err != nil {
-			t.Fatal(err)
-		}
+		t.Run(tc.routeVariable, func(t *testing.T) {
+			path := fmt.Sprintf("/voices/%s", tc.routeVariable)
+			req, err := http.NewRequest("GET", path, nil)
+			if err != nil {
+				t.Fatal(err)
+			}
 
-		rec := httptest.NewRecorder()
-		r := mux.NewRouter()
-		r.HandleFunc("/voices/{voice}", cmd.HandleVoices)
-		r.ServeHTTP(rec, req)
+			rec := httptest.NewRecorder()
+			r := mux.NewRouter()
+			r.HandleFunc("/voices/{voice}", cmd.HandleVoices)
+			r.ServeHTTP(rec, req)
 
-		if rec.Code != http.StatusOK && tc.shouldPass {
-			t.Errorf("handler on routeVariable %s: got %v want %v",
-				tc.routeVariable, rec.Code, http.StatusOK)
-		}
+			if rec.Code != http.StatusOK && tc.shouldPass {
+				t.Errorf("handler on routeVariable %s: got %v want %v",
+					tc.routeVariable, rec.Code, http.StatusOK)
+			}
 
-		if rec.Code == http.StatusOK && !tc.shouldPass {
-			t.Errorf("handler on routeVariable %s: got %v want %v",
-				tc.routeVariable, rec.Code, http.StatusInternalServerError)
-		}
+			if rec.Code == http.StatusOK && !tc.shouldPass {
+				t.Errorf("handler on routeVariable %s: got %v want %v",
+					tc.routeVariable, rec.Code, http.StatusInternalServerError)
+			}
+		})
 	}
-
 }
 
 // TestHandleDemo asserts that a demo a synchronous encoding task is sent to AWS
 // and the result returned
 func TestHandleDemo(t *testing.T) {
-	InitConfig()
-	c := []struct {
+
+	tt := []struct {
 		routeVariable string
 		shouldPass    bool
 	}{
@@ -100,27 +101,29 @@ func TestHandleDemo(t *testing.T) {
 		{"MattyLad", false},
 	}
 
-	for _, val := range c {
-		path := fmt.Sprintf("/demo/%s", val.routeVariable)
-		req, err := http.NewRequest("GET", path, nil)
-		if err != nil {
-			t.Fatal(err)
-		}
+	for _, tc := range tt {
+		t.Run(tc.routeVariable, func(t *testing.T) {
+			path := fmt.Sprintf("/demo/%s", tc.routeVariable)
+			req, err := http.NewRequest("GET", path, nil)
+			if err != nil {
+				t.Fatal(err)
+			}
 
-		rec := httptest.NewRecorder()
-		r := mux.NewRouter()
-		r.HandleFunc("/demo/{id}", cmd.HandleDemo)
-		r.ServeHTTP(rec, req)
+			rec := httptest.NewRecorder()
+			r := mux.NewRouter()
+			r.HandleFunc("/demo/{id}", cmd.HandleDemo)
+			r.ServeHTTP(rec, req)
 
-		if rec.Code != http.StatusOK && val.shouldPass {
-			t.Errorf("handler on routeVariable %s: got %v want %v",
-				val.routeVariable, rec.Code, http.StatusOK)
-		}
+			if rec.Code != http.StatusOK && tc.shouldPass {
+				t.Errorf("handler on routeVariable %s: got %v want %v",
+					tc.routeVariable, rec.Code, http.StatusOK)
+			}
 
-		if rec.Code == http.StatusOK && !val.shouldPass {
-			t.Errorf("handler on routeVariable %s: got %v want %v",
-				val.routeVariable, rec.Code, http.StatusInternalServerError)
-		}
+			if rec.Code == http.StatusOK && !tc.shouldPass {
+				t.Errorf("handler on routeVariable %s: got %v want %v",
+					tc.routeVariable, rec.Code, http.StatusInternalServerError)
+			}
+		})
 	}
 }
 
