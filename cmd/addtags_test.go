@@ -24,7 +24,7 @@ func TestAddTag(t *testing.T) {
 	}
 	log.Println(len(tags))
 	if pre == len(tags) {
-		t.Fatal("No new tag was generated")
+		t.Fatal("No  new tag was generated")
 	}
 }
 
