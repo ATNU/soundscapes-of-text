@@ -1,5 +1,7 @@
 language: go
 go: "1.10.x"
 
+go_import_path: github.com/mattnolf/polly
+
 script: 
-  - go test -v
+  - go test -t -v ./

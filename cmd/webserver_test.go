@@ -3,8 +3,8 @@ package cmd_test
 import (
 	"bytes"
 	"fmt"
-	"github.com/MattNolf/polly/cmd"
 	"github.com/gorilla/mux"
+	"github.com/mattnolf/polly/cmd"
 	"github.com/spf13/viper"
 	"net/http"
 	"net/http/httptest"

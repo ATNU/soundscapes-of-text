@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/MattNolf/polly/cmd"
+	"github.com/mattnolf/polly/cmd"
 )
 
 // Initialise cobra and execute command
