@@ -3,6 +3,7 @@ package cmd_test
 import (
 	"bytes"
 	"fmt"
+	_ "github.com/aws/aws-sdk-go/service/polly/pollyiface"
 	"github.com/gorilla/mux"
 	"github.com/mattnolf/polly/cmd"
 	"github.com/spf13/viper"
@@ -71,19 +72,19 @@ func TestHandleVoices(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			rec := httptest.NewRecorder()
+			w := httptest.NewRecorder()
 			r := mux.NewRouter()
 			r.HandleFunc("/voices/{voice}", cmd.HandleVoices)
-			r.ServeHTTP(rec, req)
+			r.ServeHTTP(w, req)
 
-			if rec.Code != http.StatusOK && tc.shouldPass {
+			if w.Code != http.StatusOK && tc.shouldPass {
 				t.Errorf("handler on routeVariable %s: got %v want %v",
-					tc.routeVariable, rec.Code, http.StatusOK)
+					tc.routeVariable, w.Code, http.StatusOK)
 			}
 
-			if rec.Code == http.StatusOK && !tc.shouldPass {
+			if w.Code == http.StatusOK && !tc.shouldPass {
 				t.Errorf("handler on routeVariable %s: got %v want %v",
-					tc.routeVariable, rec.Code, http.StatusInternalServerError)
+					tc.routeVariable, w.Code, http.StatusInternalServerError)
 			}
 		})
 	}
@@ -92,36 +93,37 @@ func TestHandleVoices(t *testing.T) {
 // TestHandleDemo asserts that a demo a synchronous encoding task is sent to AWS
 // and the result returned
 func TestHandleDemo(t *testing.T) {
-
+	InitConfig()
 	tt := []struct {
 		routeVariable string
 		shouldPass    bool
 	}{
-		{"Brian", true},
+		{"Brian", false},
+		{"Amy", false},
 		{"MattyLad", false},
 	}
 
 	for _, tc := range tt {
 		t.Run(tc.routeVariable, func(t *testing.T) {
-			path := fmt.Sprintf("/demo/%s", tc.routeVariable)
+			path := fmt.Sprintf("/demo/%v", tc.routeVariable)
 			req, err := http.NewRequest("GET", path, nil)
 			if err != nil {
 				t.Fatal(err)
 			}
 
-			rec := httptest.NewRecorder()
+			w := httptest.NewRecorder()
 			r := mux.NewRouter()
 			r.HandleFunc("/demo/{id}", cmd.HandleDemo)
-			r.ServeHTTP(rec, req)
+			r.ServeHTTP(w, req)
 
-			if rec.Code != http.StatusOK && tc.shouldPass {
+			if w.Code != http.StatusOK && tc.shouldPass {
 				t.Errorf("handler on routeVariable %s: got %v want %v",
-					tc.routeVariable, rec.Code, http.StatusOK)
+					tc.routeVariable, w.Code, http.StatusOK)
 			}
 
-			if rec.Code == http.StatusOK && !tc.shouldPass {
+			if w.Code == http.StatusOK && !tc.shouldPass {
 				t.Errorf("handler on routeVariable %s: got %v want %v",
-					tc.routeVariable, rec.Code, http.StatusInternalServerError)
+					tc.routeVariable, w.Code, http.StatusInternalServerError)
 			}
 		})
 	}

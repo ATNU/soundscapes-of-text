@@ -164,19 +164,20 @@ func HandleDemo(w http.ResponseWriter, r *http.Request) {
 	var err error
 	if fi, err = os.Stat(path.Join(viper.GetString("assets.demoPath"), vars["id"]) + ".mp3"); os.IsNotExist(err) {
 		log.Println("INFO: No demo cache available - generating one")
+		log.Println(("Hi my name is " + mux.Vars(r)["id"]))
 		f, err := Generate(("Hi my name is " + mux.Vars(r)["id"]), mux.Vars(r)["id"],
 			path.Join(viper.GetString("assets.demoPath"), mux.Vars(r)["id"]))
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte("500 - Something bad happened!"))
-			log.Println("Error found", err)
+			log.Println(err)
 			return
 		}
 		fi, err = f.Stat()
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte("500 - Something bad happened!"))
-			log.Println("Error found", err)
+			log.Println(err)
 			return
 		}
 	}
