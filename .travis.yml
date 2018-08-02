@@ -1,7 +1,9 @@
 language: go
-go: "1.10.x"
-
+go: 1.10.x
 go_import_path: github.com/mattnolf/polly
-
-script: 
-  - go test -t -v ./
+script:
+- go test -t -v ./...
+notifications:
+  secure: hVrsDzDFAx2SSFmKy5k2KAjTovZ1hd26aqwWvvpEQBAjpjp/HkWmrZQFdKdf9CEwaMYxiYk4IGUx9nkZQPnMBReKB2Ip1+JC1nsCmp9J3WSKWcVeUfILFEyHCI6RXFea7bRQ92cY5zaix03cEER0t7+qxz6e+4AMD5VZKasKagRjZGmptvY9bwB5WxCrQ3EK989xwSUuPtqynucvykOMzTwcltzOHvRAllcYclumASevnTpO1u9cx/6tOAeUGmq5i/gepeXR2eh3ZhUCUEE3wJqWDxqzo3cqKwUimysORd/r7jBdUxWrKaAUsZhwnNzUWMhoNc4XQHEF3q4NCUZxJ1O4aoBT9ouP5Jv0oaWD50I4AcTJnJZp7WN4TMoCH/862Schz+rms8GTDBwDBxnwn4JLuEMwqhKS5nHM+5FQtJCqlLYFXa0prWr625BJ8iPCKoVjj5hfv0WzLBjllZOzIR0yRKXGd/JaK/P60hX6l95RSzCq3Evd0O/45Z18yFJGjjjAPO+Ozy59A90HpZz98BqSdlptpnDaYxeqFW0aLq0gxx2xSyTv5kKwSuaQBvNxvO88dACdHtKNgQ/QRN+ZnPBLOkQgYAax7ClPkwciOGSJgqFr8T/TeIs+qqoRlhdWb5/8AWp/XSoaJg3d4boT0uEFVB3qr5Q8DL9Nx1k2hAI=
+    on_success: always
+    on_failure: always
