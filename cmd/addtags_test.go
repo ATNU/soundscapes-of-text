@@ -1,7 +1,7 @@
 package cmd_test
 
 import (
-	"github.com/mattnolf/polly/cmd"
+	"github.com/MattNolf/polly/cmd"
 	"log"
 	"testing"
 )
