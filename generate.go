@@ -1,42 +1,17 @@
-package cmd
+package main
 
 import (
 	"fmt"
 	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/polly"
 	"github.com/aws/aws-sdk-go/service/polly/pollyiface"
-	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"io"
 	"io/ioutil"
-	"log"
 	"os"
 	"path"
 	"time"
 )
-
-func init() {
-	rootCmd.AddCommand(generateCmd)
-}
-
-var generateCmd = &cobra.Command{
-	Use:   "generate",
-	Short: "Generate a TTS encoding of the provided text",
-	Long: `Generate TTS encoding using AWS Polly. Text taken from
-input cfg value`,
-	Run: func(cmd *cobra.Command, args []string) {
-		sess := session.Must(session.NewSessionWithOptions(session.Options{
-			SharedConfigState: session.SharedConfigEnable}))
-		p := polly.New(sess)
-
-		s, err := GenerateToS3("Hello my name is golang", "Brian", p)
-		if err != nil {
-			log.Fatal(err)
-		}
-		log.Println(s)
-	},
-}
 
 // Generate creates a text-to-speech encoding of the provided body of text
 // using AWS Polly
@@ -53,7 +28,7 @@ input cfg value`,
 // Returns a pointer to the generated file and any errors generated
 func Generate(body, id, path string, svc pollyiface.PollyAPI) (*os.File, error) {
 	input := &polly.SynthesizeSpeechInput{OutputFormat: aws.String(viper.GetString("outputType")),
-		TextType: aws.String("ssml"),
+		TextType: aws.String("text"),
 		Text:     aws.String(body),
 		VoiceId:  aws.String(id)}
 
@@ -130,9 +105,7 @@ func GenerateToS3(body, id string, svc pollyiface.PollyAPI) (string, error) {
 
 	o, err := svc.StartSpeechSynthesisTask(task)
 	if err != nil {
-		log.Println(err)
 		return "", err
 	}
-
-	return *o.SynthesisTask.OutputUri, err
+	return *o.SynthesisTask.OutputUri, nil
 }

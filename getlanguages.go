@@ -1,25 +1,4 @@
-package cmd
-
-import (
-	"github.com/spf13/cobra"
-	"log"
-)
-
-func init() {
-	getCmd.AddCommand(getLanguagesCmd)
-}
-
-var getLanguagesCmd = &cobra.Command{
-	Use:   "languages",
-	Short: "get languages",
-	Long:  `Gets all supported languages`,
-	Run: func(cmd *cobra.Command, args []string) {
-		if len(args) == 0 {
-			log.Fatal("Please provide a Language Code")
-		}
-		GetLanguages()
-	},
-}
+package main
 
 // GetLanguages retrieved supported languages
 //
@@ -29,7 +8,7 @@ func GetLanguages() []struct {
 	Code string
 } {
 
-	l := []struct {
+	return []struct {
 		Name string
 		Code string
 	}{
@@ -58,5 +37,4 @@ func GetLanguages() []struct {
 		{"Turkish", "tr-TR"},
 		{"Welsh", "cy-GB"},
 	}
-	return l
 }

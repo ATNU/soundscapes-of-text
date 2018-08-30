@@ -1,93 +1,24 @@
-package cmd
+package main
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/polly"
 	"github.com/gorilla/mux"
-	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
-	"os/signal"
 	"path"
 	"strconv"
 	"time"
 )
 
-var sess *session.Session
+var sess = session.Must(session.NewSessionWithOptions(session.Options{
+	SharedConfigState: session.SharedConfigEnable}))
 var p *polly.Polly
-
-func init() {
-	rootCmd.AddCommand(webserverCmd)
-
-	sess = session.Must(session.NewSessionWithOptions(session.Options{
-		SharedConfigState: session.SharedConfigEnable}))
-	p = polly.New(sess)
-}
-
-var webserverCmd = &cobra.Command{
-	Use:   "webserver",
-	Short: "Launches a RESTful Web API for backend behaviour",
-	Long: `Webserver creates a RESTful http api for backend bevahiour.
-	The following requests can be handled:
-	- /languages Get all supported languages
-	- /voice/{voice} Get all voices of specified language
-	- /demo/{id} Get a demo sample of the specified voice`,
-	Run: func(cmd *cobra.Command, args []string) {
-		WebServer()
-	},
-}
-
-// WebServer initiates a HTTP webserver for providing
-// a RESTful API
-//
-// The following paths are handled:
-// - GET -> /languages
-// - GET -> /voices/{languageCoce}
-// - GET -> /demo/{voiceID}
-// - POST -> /generate?voice={voiceID}
-//
-// Any unrouted request will return 404 error
-func WebServer() {
-	r := mux.NewRouter()
-	r.HandleFunc("/languages", HandleLanguages).Methods("GET")
-	r.HandleFunc("/voices/{voice}", HandleVoices).Methods("GET")
-	r.HandleFunc("/demo/{id}", HandleDemo).Methods("GET")
-	r.HandleFunc("/generate", HandleGenerateS3).Methods("POST")
-
-	log.Println("Launching webserver at address: ", viper.GetString("webserver.addr"))
-	srv := &http.Server{
-		Addr:         viper.GetString("webserver.addr"),
-		WriteTimeout: time.Second * viper.GetDuration("webserver.timeout.write"),
-		ReadTimeout:  time.Second * viper.GetDuration("webserver.timeout.read"),
-		IdleTimeout:  time.Second * viper.GetDuration("webserver.timeout.idle"),
-		Handler:      r,
-	}
-
-	go func() {
-		if err := srv.ListenAndServe(); err != nil {
-			log.Println(err)
-		}
-	}()
-
-	c := make(chan os.Signal, 1)
-
-	signal.Notify(c, os.Interrupt)
-
-	<-c
-
-	ctx, cancel := context.WithTimeout(context.Background(), viper.GetDuration("webserver.timeout.cancel"))
-	defer cancel()
-	srv.Shutdown(ctx)
-
-	log.Println("INFO: Gracefully shutting down")
-	os.Exit(0)
-}
 
 // HandleLanguages returns all supported AWS Polly languages
 // Response served as application/JSON with format (eg):
@@ -102,6 +33,8 @@ func HandleLanguages(w http.ResponseWriter, r *http.Request) {
 
 // HandleVoices returns all supported AWS Polly voices
 func HandleVoices(w http.ResponseWriter, r *http.Request) {
+	p = polly.New(sess)
+
 	vars := mux.Vars(r)
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:4200")
@@ -123,6 +56,7 @@ func HandleVoices(w http.ResponseWriter, r *http.Request) {
 //
 // Each voice demo is cached to avoid regeneration overheads
 func HandleDemo(w http.ResponseWriter, r *http.Request) {
+	p = polly.New(sess)
 	vars := mux.Vars(r)
 	log.Println("INFO: Voice request received " + vars["id"])
 
@@ -130,20 +64,17 @@ func HandleDemo(w http.ResponseWriter, r *http.Request) {
 	var err error
 	if fi, err = os.Stat(path.Join(viper.GetString("assets.demoPath"), vars["id"]) + ".mp3"); os.IsNotExist(err) {
 		log.Println("INFO: No demo cache available - generating one")
-		log.Println(("Hi my name is " + mux.Vars(r)["id"]))
 		f, err := Generate(("Hi my name is " + mux.Vars(r)["id"]), mux.Vars(r)["id"],
 			path.Join(viper.GetString("assets.demoPath"), mux.Vars(r)["id"]), p)
 		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte("400 - Something bad happened!"))
 			log.Println(err)
+			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
 		fi, err = f.Stat()
 		if err != nil {
+			log.Println("This error2")
 			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte("400 - Something bad happened!"))
-			log.Println(err)
 			return
 		}
 	}
@@ -151,7 +82,7 @@ func HandleDemo(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Disposition", "attachment; filename="+fi.Name())
 	w.Header().Set("Content-Type", "audio/mpeg")
 	w.Header().Set("Content-Length", strconv.Itoa(int(fi.Size())))
-	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:4200")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 
 	http.ServeFile(w, r, path.Join(viper.GetString("assets.demoPath"), fi.Name()))
 }
@@ -194,6 +125,7 @@ func HandleGenerateS3(w http.ResponseWriter, r *http.Request) {
 
 // HandleGenerateFile returns a text-to-speech encoding of the provided
 // request body
+// deprecated
 func HandleGenerateFile(w http.ResponseWriter, r *http.Request) {
 	f, err := Generate(r.FormValue("ssml"), r.FormValue("voice"),
 		path.Join(viper.GetString("assets.ttsPath"), fmt.Sprint(time.Now().Unix())), p)

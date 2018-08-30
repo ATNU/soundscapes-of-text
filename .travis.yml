@@ -1,9 +1,11 @@
+sudo: required
+services:
+- docker
 language: go
 go: 1.10.x
-go_import_path: github.com/mattnolf/polly
-
-before-install: 
-  - docker build -t mattnolf/polly .
+go_import_path: github.com/mattnolf/sot
+before-install:
+- docker build -t mattnolf/sot .
 script:
 - go test -v ./...
 notifications:

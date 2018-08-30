@@ -3,9 +3,9 @@
     "input": "sample-text.xml",
     "outputType": "mp3",
     "assets": {
-        "demoPath": "../assets/demo",
-        "ttsPath": "../assets/tts",
-        "tagsPath": "../assets/tag"
+        "demoPath": "assets/demo",
+        "ttsPath": "assets/tts",
+        "tagsPath": "assets/tag"
     },
     "webserver": {
         "addr": "0.0.0.0:8080",

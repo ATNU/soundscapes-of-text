@@ -1,10 +1,30 @@
 package main
 
 import (
-	"github.com/mattnolf/polly/cmd"
+	"github.com/fsnotify/fsnotify"
+	"github.com/spf13/viper"
+	"log"
 )
 
-// Initialise cobra and execute command
+const cfgName string = ".cfg"
+
 func main() {
-	cmd.Execute()
+	SetupConfig()
+	WebServer()
+}
+
+// SetupConfig loads configuration file and watched for modifications
+func SetupConfig() {
+	viper.SetConfigName(cfgName)
+	viper.AddConfigPath(".")
+	err := viper.ReadInConfig()
+	if err != nil {
+		log.Fatal("Failed to find configuration file")
+	}
+	log.Println("Successfully found configuration file " + cfgName)
+
+	viper.WatchConfig()
+	viper.OnConfigChange(func(e fsnotify.Event) {
+		log.Printf("Configuration file modified\nRestarting connection...")
+	})
 }

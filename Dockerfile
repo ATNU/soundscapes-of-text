@@ -1,15 +1,24 @@
 FROM golang:latest as builder
 
-WORKDIR /go/src/github.com/mattnolf/polly
+WORKDIR /go/src/webserver
 
-COPY . .
+RUN go get github.com/spf13/viper &&        \
+    go get github.com/gorilla/mux &&        \
+    go get github.com/fsnotify/fsnotify &&  \
+    go get github.com/aws/aws-sdk-go/aws/session && \
+	go get github.com/aws/aws-sdk-go/service/polly && \
+    go get github.com/aws/aws-sdk-go/aws && \
+	go get github.com/aws/aws-sdk-go/service/polly/pollyiface
 
-RUN go get ./...
+COPY . ./
 
-RUN CGO_ENABLED=0 GOOS=linux go install ./...
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix nocgo -o /app .
 
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main .
+FROM scratch
 
-FROM alpine:latest 
+COPY --from=builder /app ./
+COPY .cfg.json ./
 
-COPY --from=builder /go/src/github.com/mattnolf/polly/polly bin/polly
+EXPOSE 8080:8080
+
+ENTRYPOINT [ "./app" ]
