@@ -1,6 +1,9 @@
 package cmd
 
 import (
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/polly"
+	"github.com/aws/aws-sdk-go/service/polly/pollyiface"
 	"github.com/fsnotify/fsnotify"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -17,7 +20,10 @@ var serveCmd = &cobra.Command{
 	Long: `Serve watches for any file changes and generates a new tts encoding at the point of file change.
 WARNING, may be costly as generating new tts encodings often `,
 	Run: func(cmd *cobra.Command, args []string) {
-		err := Serve()
+		sess := session.Must(session.NewSessionWithOptions(session.Options{
+			SharedConfigState: session.SharedConfigEnable}))
+		p := polly.New(sess)
+		err := Serve(p)
 		if err != nil {
 			log.Println(err)
 		}
@@ -26,7 +32,12 @@ WARNING, may be costly as generating new tts encodings often `,
 
 // Serve starts a listener on the input text, and generates a new
 // TTS encoding at the point the file is modified
-func Serve() error {
+//
+// Parameters:
+// - pollyiface.PollyAPI Polly instance with valid session
+//
+// Returns any errors encountered
+func Serve(svc pollyiface.PollyAPI) error {
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
 		return err
@@ -43,7 +54,7 @@ func Serve() error {
 			select {
 			case event := <-watcher.Events:
 				log.Println(event)
-				GenerateFromFile()
+				GenerateFromFile(svc)
 			case err := <-watcher.Errors:
 				log.Println(err)
 			}

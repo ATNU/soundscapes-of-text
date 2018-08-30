@@ -4,6 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/polly"
 	"github.com/gorilla/mux"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -17,8 +19,15 @@ import (
 	"time"
 )
 
+var sess *session.Session
+var p *polly.Polly
+
 func init() {
 	rootCmd.AddCommand(webserverCmd)
+
+	sess = session.Must(session.NewSessionWithOptions(session.Options{
+		SharedConfigState: session.SharedConfigEnable}))
+	p = polly.New(sess)
 }
 
 var webserverCmd = &cobra.Command{
@@ -39,7 +48,6 @@ var webserverCmd = &cobra.Command{
 //
 // The following paths are handled:
 // - GET -> /languages
-// - GET -> /tags
 // - GET -> /voices/{languageCoce}
 // - GET -> /demo/{voiceID}
 // - POST -> /generate?voice={voiceID}
@@ -48,11 +56,11 @@ var webserverCmd = &cobra.Command{
 func WebServer() {
 	r := mux.NewRouter()
 	r.HandleFunc("/languages", HandleLanguages).Methods("GET")
-	r.HandleFunc("/tags", HandleTags).Methods("GET")
 	r.HandleFunc("/voices/{voice}", HandleVoices).Methods("GET")
 	r.HandleFunc("/demo/{id}", HandleDemo).Methods("GET")
 	r.HandleFunc("/generate", HandleGenerateS3).Methods("POST")
 
+	log.Println("Launching webserver at address: ", viper.GetString("webserver.addr"))
 	srv := &http.Server{
 		Addr:         viper.GetString("webserver.addr"),
 		WriteTimeout: time.Second * viper.GetDuration("webserver.timeout.write"),
@@ -83,12 +91,6 @@ func WebServer() {
 
 // HandleLanguages returns all supported AWS Polly languages
 // Response served as application/JSON with format (eg):
-//	{
-//		"LanguageName": "English American",
-//		"LanguageCode": "en-US"
-//	},
-//
-// Any errors contacting AWS will be returned to client
 func HandleLanguages(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:4200")
@@ -98,49 +100,16 @@ func HandleLanguages(w http.ResponseWriter, r *http.Request) {
 	en.Encode(GetLanguages())
 }
 
-// HandleTags returns all defined tags to be used for
-// generating SSML tts encodings
-// Response served as application/JSON with format (eg):
-//	{
-//		"Name": "Happy",
-//		"tags": {
-//					"tone": "x",
-//					"break": "2s"
-//				}
-//	},
-//
-// Any errors generated will be returned to client
-func HandleTags(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:4200")
-	log.Println("INFO: Tag Request received")
-
-	// Pre defined set of tags stored in memory
-	// Retreieve file and build up struct slice
-	// JSON write slice
-
-}
-
 // HandleVoices returns all supported AWS Polly voices
-// Response served as application/JSON with format (eg):
-//	{
-//		"Gender": "Male",
-//		"ID": "Brian",
-//		"LanguageCode": "en-GB",
-//		"LanguageName": "English",
-//		"Name": "Brian",
-//	},
-//
-// Any errors generated will be returned to client
 func HandleVoices(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:4200")
 	log.Println("INFO: Voice request received: " + vars["voice"])
-	v, err := GetVoices(vars["voice"])
+	v, err := GetVoices(vars["voice"], p)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("500 - Something bad happened!"))
+		w.Write([]byte("400 - Something bad happened!"))
 		log.Println(err)
 		return
 	}
@@ -151,11 +120,8 @@ func HandleVoices(w http.ResponseWriter, r *http.Request) {
 
 // HandleDemo returns a demonstration of an AWS Polly voice
 // speaking "Hi my name is: {voice}"
-// Response served as audio/mpeg with format (eg):
 //
 // Each voice demo is cached to avoid regeneration overheads
-//
-// Any errors encountered will return a 500 error to client
 func HandleDemo(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	log.Println("INFO: Voice request received " + vars["id"])
@@ -166,17 +132,17 @@ func HandleDemo(w http.ResponseWriter, r *http.Request) {
 		log.Println("INFO: No demo cache available - generating one")
 		log.Println(("Hi my name is " + mux.Vars(r)["id"]))
 		f, err := Generate(("Hi my name is " + mux.Vars(r)["id"]), mux.Vars(r)["id"],
-			path.Join(viper.GetString("assets.demoPath"), mux.Vars(r)["id"]))
+			path.Join(viper.GetString("assets.demoPath"), mux.Vars(r)["id"]), p)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte("500 - Something bad happened!"))
+			w.Write([]byte("400 - Something bad happened!"))
 			log.Println(err)
 			return
 		}
 		fi, err = f.Stat()
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte("500 - Something bad happened!"))
+			w.Write([]byte("400 - Something bad happened!"))
 			log.Println(err)
 			return
 		}
@@ -193,59 +159,47 @@ func HandleDemo(w http.ResponseWriter, r *http.Request) {
 // HandleGenerateS3 returns the S3 URL of the text-to-speech encoding task
 // generated for the request body
 // The generated URL is only returned once the resource is generated and s3 URI returns 200
-//
-// Any errors encountered will return a 500 error to client
 func HandleGenerateS3(w http.ResponseWriter, r *http.Request) {
 	log.Println("INFO: Generate request received")
-	log.Println("Generate: ")
 
 	bod, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("500 - Something bad happened!"))
 		log.Println(err)
 		return
 	}
 
-	f, err := GenerateToS3(string(bod[:]), r.URL.Query().Get("voice"))
-
+	f, err := GenerateToS3(string(bod[:]), r.URL.Query().Get("voice"), p)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("500 - Something bad happened!"))
 		log.Println(err)
 		return
 	}
 
 	var timeout int
-	for resp, err := http.Head(f); resp.StatusCode != 200 || timeout >= viper.GetInt("s3.maxRetryCount"); {
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte("500 - Something bad happened!"))
-			log.Println(err)
-			return
+	for resp, err := http.Head(f); err == nil; {
+		if resp.StatusCode != 200 || timeout < viper.GetInt("s3.maxRetryCount") {
+			time.Sleep(2 * time.Second)
+			resp, err = http.Head(f)
+			timeout = +1
 		}
-		time.Sleep(2 * time.Second)
-		resp, err = http.Head(f)
-		timeout = +1
-		log.Println("Code", resp.StatusCode)
+		w.Header().Set("Content-Type", "application/x-www-form-urlencoded")
+		w.Header().Set("Access-Control-Allow-Origin", viper.GetString("webserver.clientAddr"))
+		w.Write([]byte(f))
+		return
 	}
-
-	w.Header().Set("Content-Type", "application/x-www-form-urlencoded")
-	w.Header().Set("Access-Control-Allow-Origin", viper.GetString("webserver.clientAddr"))
-	w.Write([]byte(f))
+	w.WriteHeader(http.StatusInternalServerError)
+	log.Println(err)
 }
 
 // HandleGenerateFile returns a text-to-speech encoding of the provided
 // request body
-// Response served as audio/mpeg with format (eg):
-//
-// Any errors encountered will return a 500 error to client
 func HandleGenerateFile(w http.ResponseWriter, r *http.Request) {
 	f, err := Generate(r.FormValue("ssml"), r.FormValue("voice"),
-		path.Join(viper.GetString("assets.ttsPath"), fmt.Sprint(time.Now().Unix())))
+		path.Join(viper.GetString("assets.ttsPath"), fmt.Sprint(time.Now().Unix())), p)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("500 - Something bad happened!"))
+		w.Write([]byte("400 - Something bad happened!"))
 		log.Println(err)
 		return
 	}
@@ -253,7 +207,7 @@ func HandleGenerateFile(w http.ResponseWriter, r *http.Request) {
 	fi, err := f.Stat()
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("500 - Something bad happened!"))
+		w.Write([]byte("400 - Something bad happened!"))
 		log.Println(err)
 		return
 	}

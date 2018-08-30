@@ -1,6 +1,9 @@
 language: go
 go: 1.10.x
 go_import_path: github.com/mattnolf/polly
+
+before-install: 
+  - docker build -t mattnolf/polly .
 script:
 - go test -v ./...
 notifications:

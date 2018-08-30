@@ -4,6 +4,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/polly"
+	"github.com/aws/aws-sdk-go/service/polly/pollyiface"
 	"github.com/spf13/cobra"
 	"log"
 )
@@ -20,7 +21,11 @@ var getVoicesCmd = &cobra.Command{
 		if len(args) == 0 {
 			log.Fatal("Please provide a Language Code")
 		}
-		LogVoices(args[0])
+		sess := session.Must(session.NewSessionWithOptions(session.Options{
+			SharedConfigState: session.SharedConfigEnable}))
+
+		p := polly.New(sess)
+		LogVoices(args[0], p)
 	},
 }
 
@@ -29,17 +34,12 @@ var getVoicesCmd = &cobra.Command{
 // - string language code
 //
 // Returns a DescribeVoicesOutput containing all voices, and any errors generated
-func GetVoices(lan string) (*polly.DescribeVoicesOutput, error) {
-	sess := session.Must(session.NewSessionWithOptions(session.Options{
-		SharedConfigState: session.SharedConfigEnable}))
-
-	p := polly.New(sess)
-
+func GetVoices(lan string, svc pollyiface.PollyAPI) (*polly.DescribeVoicesOutput, error) {
 	input := &polly.DescribeVoicesInput{
 		LanguageCode: aws.String(lan),
 	}
 
-	result, err := p.DescribeVoices(input)
+	result, err := svc.DescribeVoices(input)
 	if err != nil {
 		return nil, err
 	}
@@ -49,6 +49,6 @@ func GetVoices(lan string) (*polly.DescribeVoicesOutput, error) {
 // LogVoices returns available AWS voices for specified language code
 // Parameters:
 // - string language code
-func LogVoices(lan string) {
-	log.Println(GetVoices(lan))
+func LogVoices(lan string, svc pollyiface.PollyAPI) {
+	log.Println(GetVoices(lan, svc))
 }

@@ -5,8 +5,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/polly"
-	"github.com/aws/aws-sdk-go/service/s3"
-	"github.com/aws/aws-sdk-go/service/s3/s3manager"
+	"github.com/aws/aws-sdk-go/service/polly/pollyiface"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"io"
@@ -27,7 +26,15 @@ var generateCmd = &cobra.Command{
 	Long: `Generate TTS encoding using AWS Polly. Text taken from
 input cfg value`,
 	Run: func(cmd *cobra.Command, args []string) {
-		GenerateFromFile()
+		sess := session.Must(session.NewSessionWithOptions(session.Options{
+			SharedConfigState: session.SharedConfigEnable}))
+		p := polly.New(sess)
+
+		s, err := GenerateToS3("Hello my name is golang", "Brian", p)
+		if err != nil {
+			log.Fatal(err)
+		}
+		log.Println(s)
 	},
 }
 
@@ -38,22 +45,19 @@ input cfg value`,
 // - string body of text
 // - string id of AWS Polly voice
 // - string path of output file
+// - pollyiface.PollyAPI Polly instance with valid session
 //
 // Configuration:
 // - outputType
 //
 // Returns a pointer to the generated file and any errors generated
-func Generate(body, id, path string) (*os.File, error) {
-	sess := session.Must(session.NewSessionWithOptions(session.Options{
-		SharedConfigState: session.SharedConfigEnable}))
-	p := polly.New(sess)
-
+func Generate(body, id, path string, svc pollyiface.PollyAPI) (*os.File, error) {
 	input := &polly.SynthesizeSpeechInput{OutputFormat: aws.String(viper.GetString("outputType")),
 		TextType: aws.String("ssml"),
 		Text:     aws.String(body),
 		VoiceId:  aws.String(id)}
 
-	output, err := p.SynthesizeSpeech(input)
+	output, err := svc.SynthesizeSpeech(input)
 	if err != nil {
 		return nil, err
 	}
@@ -73,25 +77,30 @@ func Generate(body, id, path string) (*os.File, error) {
 // GenerateFromFile creates a text-to-speech encoding of the provided text file
 // The generated file is placed in the root folder
 //
+// Parameters:
+// - pollyiface.PollyAPI Polly instance with valid session
+//
 // Configuration:
 // - input
 // - voice
 // - assets.ttsPath
 //
-// Any errors generated will be logged followed by graceful shutdown
-func GenerateFromFile() {
+// Returns any errors generated
+func GenerateFromFile(svc pollyiface.PollyAPI) error {
 	contents, err := ioutil.ReadFile(viper.GetString("input"))
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	s := string(contents[:])
 	aws.String(viper.GetString("voice"))
 	_, err = Generate(s, viper.GetString("voice"),
-		path.Join(viper.GetString("assets.ttsPath"), fmt.Sprint(time.Now().Unix())))
+		path.Join(viper.GetString("assets.ttsPath"), fmt.Sprint(time.Now().Unix())), svc)
 
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
+
+	return nil
 }
 
 // GenerateToS3 creates a synthesis task of the provided body of text
@@ -106,51 +115,24 @@ func GenerateFromFile() {
 // - s3.outputFormat
 // - s3.bucketName
 // - sns.pollyTopicName
+// - pollyiface.PollyAPI Polly instance with valid session
 //
 // Returns the ID of the asynchronous task
-func GenerateToS3(body, id string) (string, error) {
-	sess := session.Must(session.NewSessionWithOptions(session.Options{
-		SharedConfigState: session.SharedConfigEnable}))
-	p := polly.New(sess)
+func GenerateToS3(body, id string, svc pollyiface.PollyAPI) (string, error) {
 	task := new(polly.StartSpeechSynthesisTaskInput)
 
 	task.SetOutputFormat(viper.GetString("s3.outputFormat"))
 	task.SetOutputS3BucketName(viper.GetString("s3.bucketName"))
 	task.SetText(body)
-	task.SetTextType("text")
+	task.SetTextType("ssml")
 	task.SetSnsTopicArn(viper.GetString("sns.pollyTopicName"))
 	task.SetVoiceId(id)
 
-	o, err := p.StartSpeechSynthesisTask(task)
+	o, err := svc.StartSpeechSynthesisTask(task)
 	if err != nil {
+		log.Println(err)
 		return "", err
 	}
 
 	return *o.SynthesisTask.OutputUri, err
-}
-
-// retrieveFromS3 downloads an object from S3 into a local file.
-// Parameters:
-// - string bucket name
-// - string key name
-//
-// Returns a pointer to the generated file
-func retrieveFromS3(bucket, key string) {
-	sess := session.Must(session.NewSessionWithOptions(session.Options{
-		SharedConfigState: session.SharedConfigEnable}))
-	dl := s3manager.NewDownloader(sess)
-
-	f, err := os.Create("test")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	n, err := dl.Download(f, &s3.GetObjectInput{
-		Bucket: aws.String(bucket),
-		Key:    aws.String(key),
-	})
-	if err != nil {
-		log.Fatal(err)
-	}
-	log.Println(n)
 }

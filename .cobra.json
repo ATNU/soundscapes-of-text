@@ -3,9 +3,9 @@
     "input": "sample-text.xml",
     "outputType": "mp3",
     "assets": {
-        "demoPath": "assets/demo",
-        "ttsPath": "assets/tts",
-        "tagsPath": "assets/tag"
+        "demoPath": "../assets/demo",
+        "ttsPath": "../assets/tts",
+        "tagsPath": "../assets/tag"
     },
     "webserver": {
         "addr": "0.0.0.0:8080",
@@ -18,11 +18,11 @@
         }
     },
     "s3": {
-        "bucketName": "uk.ac.ncl.atnu.sot.output",
+        "bucketName": "uk.ac.ncl.sot",
         "outputFormat": "mp3",
         "maxRetryCount": 10
     },
     "sns": {
-        "pollyTopicName": "arn:aws:sns:us-west-2:438791141487:polly"
+        "pollyTopicName": "arn:aws:sns:us-east-1:438791141487:Polly"
     }
 }

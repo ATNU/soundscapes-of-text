@@ -17,7 +17,7 @@ var getLanguagesCmd = &cobra.Command{
 		if len(args) == 0 {
 			log.Fatal("Please provide a Language Code")
 		}
-		LogVoices(args[0])
+		GetLanguages()
 	},
 }
 
