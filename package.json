@@ -39,6 +39,7 @@
     "ngx-editor": "^3.3.0",
     "ngx-quill": "^3.3.0",
     "rxjs": "^6.1.0",
+    "url-parse": "^1.4.3",
     "videogular2": "^6.3.0",
     "zone.js": "^0.8.26"
   },
