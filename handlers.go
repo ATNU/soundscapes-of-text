@@ -110,7 +110,8 @@ func HandleGenerateS3(w http.ResponseWriter, r *http.Request) {
 
 	var timeout int
 	for resp, err := http.Head(f); err == nil; {
-		if resp.StatusCode != 200 || timeout < viper.GetInt("s3.maxRetryCount") {
+		for resp.StatusCode != 200 && timeout < viper.GetInt("s3.maxRetryCount") {
+			log.Println("in I go")
 			time.Sleep(2 * time.Second)
 			resp, err = http.Head(f)
 			timeout = +1
