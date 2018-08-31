@@ -1,0 +1,174 @@
+.mat-tab-group {
+    width: 100%;
+    padding-top: 10px;
+    padding-left: 10px;
+    height: 600px;
+}
+
+mat-form-field {
+    width: 30%;
+    padding-bottom: 50px;
+}
+
+.voiceSelect {
+    height: 100%;
+    width: 100%;
+}
+
+.eraserColor {
+    width: 100%;
+    height: 2px;
+    background-color: white;
+}
+
+.breakColor {
+    width: 100%;
+    height: 2px;
+    background-color: #e07575;
+}
+
+.emphasisColor {
+    width: 100%;
+    height: 2px;
+    background-color: #9175e0;
+}
+
+.prosodyColor {
+    width: 100%;
+    height: 2px;
+    background-color: #c9e075;
+}
+
+.voices {
+    margin: 0 0 2em 0;
+    list-style-type: none;
+    padding: 0;
+    width: 100%;
+    height: 50px;
+    text-align: center;
+    display: block;
+}
+
+.voices li {
+    position: relative;
+    text-align: center;
+    cursor: pointer;
+    background-color: #EEE;
+    margin: .5em;
+    padding: .3em 0;
+    height: 40px;
+    border-radius: 4px;
+}
+
+
+.voices li:hover {
+    color: #607D8B;
+    background-color: #DDD;
+    left: .1em;
+  }
+  
+
+.voices a {
+    color: #888;
+    text-decoration: none;
+    position: relative;
+    display: block;
+    width: 250px;
+  }
+  
+
+.ng-star-inserted {
+    height: 50px;
+}  
+.voices a:hover {
+    color:#607D8B;
+}
+  
+.voices .languageCode {
+    display: inline-flex;
+    font-size: medium;
+    float: left;
+    color: white;
+    padding: 1em 1em 0.4em 1em;
+    background-color: #607D8B;
+    top: -5px;
+    position: relative; 
+    border-radius: 4px 0 0 4px;
+}
+
+.voices .gender {
+    display: inline-flex;
+    font-size: medium;
+    float: left;
+    color: white;
+    padding: 1em 1em 0.4em 1em;
+    margin-left: 2em;
+    background-color: #607D8B;
+    top: -5px;
+    position: relative;
+    border-radius: 4px 4px 4px 4px;
+}
+
+.voices .name {
+    font-size: 25px;
+}
+
+.selectedTrue {
+    background-color: pink;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.prosody {
+    height: 260px;
+}
+
+.prosodyCard {
+    width: 30%;
+    float: left;
+}
+
+
+.mat-card.example-card {
+    width: calc(100% - 50px);
+    margin: 25px auto;
+    padding-bottom: 20px;
+  
+    &.fxClass-xs,
+    &.fxClass-sm {
+      width: calc(100% - 20px);
+      margin: 10px auto;
+    }
+  
+    app-calendar {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+  }
+
+button {
+    border: none;
+    background: transparent;
+}
+
+button.play {
+    position: relative;
+    float: right;
+}
+
+button :hover {
+    color: rgb(95, 24, 153);
+}
