@@ -93,6 +93,7 @@ func HandleDemo(w http.ResponseWriter, r *http.Request) {
 func HandleGenerateS3(w http.ResponseWriter, r *http.Request) {
 	log.Println("INFO: Generate request received")
 
+	p = polly.New(sess)
 	bod, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -127,6 +128,7 @@ func HandleGenerateS3(w http.ResponseWriter, r *http.Request) {
 // request body
 // deprecated
 func HandleGenerateFile(w http.ResponseWriter, r *http.Request) {
+	p = polly.New(sess)
 	f, err := Generate(r.FormValue("ssml"), r.FormValue("voice"),
 		path.Join(viper.GetString("assets.ttsPath"), fmt.Sprint(time.Now().Unix())), p)
 	if err != nil {

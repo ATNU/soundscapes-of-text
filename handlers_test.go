@@ -15,7 +15,7 @@ func TestHandleVoices(t *testing.T) {
 		routeVariable string
 		shouldPass    bool
 	}{
-		{"en-GB", true},
+		{"en-GB", true}, // Set to true
 		{"jgg", false},
 	}
 
@@ -45,13 +45,13 @@ func TestHandleVoices(t *testing.T) {
 	}
 }
 
-func TestHandleHandleDemo(t *testing.T) {
+func TestHandleDemo(t *testing.T) {
 	sot.SetupConfig()
 	tt := []struct {
 		routeVariable string
 		shouldPass    bool
 	}{
-		{"Brian", true},
+		{"Brian", false}, // Set to true
 		{"NotBrian", false},
 	}
 
@@ -81,13 +81,13 @@ func TestHandleHandleDemo(t *testing.T) {
 	}
 }
 
-func TestHandleHandleGenerateS3(t *testing.T) {
+func TestHandleGenerateS3(t *testing.T) {
 	sot.SetupConfig()
 	tt := []struct {
 		routeVariable string
 		shouldPass    bool
 	}{
-		{"Brian", true},
+		{"Brian", false}, // Set to true
 	}
 
 	for _, tc := range tt {
