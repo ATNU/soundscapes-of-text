@@ -24,7 +24,7 @@ var p *polly.Polly
 // Response served as application/JSON with format (eg):
 func HandleLanguages(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:4200")
+	w.Header().Set("Access-Control-Allow-Origin", viper.GetString("webserver.clientAddr"))
 	log.Println("INFO: Language Request received")
 
 	en := json.NewEncoder(w)
@@ -37,7 +37,7 @@ func HandleVoices(w http.ResponseWriter, r *http.Request) {
 
 	vars := mux.Vars(r)
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:4200")
+	w.Header().Set("Access-Control-Allow-Origin", viper.GetString("webserver.clientAddr"))
 	log.Println("INFO: Voice request received: " + vars["voice"])
 	v, err := GetVoices(vars["voice"], p)
 	if err != nil {

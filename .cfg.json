@@ -9,7 +9,7 @@
     },
     "webserver": {
         "addr": "0.0.0.0:8080",
-        "clientAddr": "http://localhost:4200",
+        "clientAddr": "*",
         "timeout": {
             "write": 15,
             "read": 15,
