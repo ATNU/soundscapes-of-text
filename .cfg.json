@@ -18,7 +18,7 @@
         }
     },
     "s3": {
-        "bucketName": "uk.ac.ncl.sot",
+        "bucketName": "atnu.soundscapes",
         "outputFormat": "mp3",
         "maxRetryCount": 10
     },

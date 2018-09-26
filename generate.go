@@ -99,7 +99,8 @@ func GenerateToS3(body, id string, svc pollyiface.PollyAPI) (string, error) {
 	task.SetOutputFormat(viper.GetString("s3.outputFormat"))
 	task.SetOutputS3BucketName(viper.GetString("s3.bucketName"))
 	task.SetText(body)
-	task.SetTextType("ssml")
+	//task.SetTextType("ssml")
+	task.SetTextType("text")
 	task.SetSnsTopicArn(viper.GetString("sns.pollyTopicName"))
 	task.SetVoiceId(id)
 
