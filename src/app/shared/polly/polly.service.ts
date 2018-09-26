@@ -16,7 +16,7 @@ import { PollyTag } from '@app/shared/polly/polly-tag';
 export class PollyService {
 
   private voicesUrl = '/voices';
-  private demoUrl = 'http://localhost:8080/demo';
+  private demoUrl = '/demo';
   private genUrl = '/generate';
 
   private encodingText = new Subject<string>();
