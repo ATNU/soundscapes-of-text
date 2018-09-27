@@ -6,6 +6,7 @@ export class PollySelection {
     private _ssml: string;
     private _css: string;
     private _litter: number;
+    private _csslitter: number;
 
     constructor(caretStart: number, caretEnd: number, range: string) {
         this._caretStart = caretStart;
@@ -67,11 +68,18 @@ export class PollySelection {
     }
 
     public get litter(): number {
-        return this._css.length - (this._caretEnd - this._caretStart);
-        // return this._litter;
+        return this._litter;
     }
 
     public set litter(litter: number) {
         this._litter = litter;
+    }
+
+    public get csslitter(): number {
+        return this._csslitter;
+    }
+
+    public set csslitter(csslitter: number) {
+        this._csslitter = csslitter;
     }
 }

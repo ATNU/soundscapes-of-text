@@ -31,7 +31,7 @@ export class TextComponent implements OnInit, OnDestroy {
 
   constructor(private pollyservice: PollyService, private sanitizer: DomSanitizer) {
     this.encodingTextSubscription = pollyservice.encodingTextUpdate$.subscribe(encodingText => {
-      this.encodingText = encodingText;
+      // this.encodingText = encodingText;
     });
     this.encodingTagSubscription = pollyservice.encodingTagUpdate$.subscribe(encodingTag => {
       this.encodingTag = encodingTag;
@@ -68,7 +68,7 @@ export class TextComponent implements OnInit, OnDestroy {
 
   updateText(oField: any) {
     this.addTag(oField);
-    this.pollyservice.updateText(this.encodingText);
+    // this.pollyservice.updateText(this.encodingText);
   }
 
   onChange(deviceValue: TextPreset) {
@@ -83,24 +83,41 @@ export class TextComponent implements OnInit, OnDestroy {
    */
   addTag(oField: any) {
     if (window.getSelection().toString() !== '' || oField.selectionStart === '0') {
-      // Because caret start and caret end are undefined
-      const selection = new PollySelection(oField.selectionStart, oField.selectionEnd
-        , window.getSelection().toString());
 
-      console.log('Ofield ' + oField);
+      let selection: PollySelection;
+      if (oField.selectionStart === undefined && oField.selectionEnd === undefined ) {
+        let dif = 0;
+        if (this.selections.length > 0) {
+          dif = this.selections[this.selections.length - 1].caretEnd;
+        }
+
+        selection = new PollySelection((window.getSelection().anchorOffset + dif),
+        window.getSelection().focusOffset + dif
+          , window.getSelection().toString());
+      } else {
+        selection = new PollySelection(oField.selectionStart, oField.selectionEnd
+          , window.getSelection().toString());
+      }
+
       selection.ssml = this.encodingTag.wrap(window.getSelection().toString());
       selection.css = this.encodingTag.paint(window.getSelection().toString());
       selection.litter = this.encodingTag.litter();
+      selection.csslitter = this.encodingTag.csslitter();
 
+      let error = false;
       this.selections.forEach(idx => {
         if (selection.overrides(idx) || selection.overlaps(idx)) {
           console.log('Error');
+          console.log(idx.caretStart, idx.caretEnd, selection.caretStart, selection.caretEnd);
+          error = true;
           return;
         }
       });
-      this.selections.push(selection);
-      this.addTags();
-      console.log(this.selections);
+      if (!error) {
+        this.selections.push(selection);
+        this.addTags();
+        console.log(this.selections);
+      }
     }
   }
 
@@ -111,20 +128,30 @@ export class TextComponent implements OnInit, OnDestroy {
    */
   addTags(): string {
     let p = this.encodingText;
+    let css = this.encodingText;
+
     let litter = 0;
+    let csslitter = 0;
     this.selections.forEach(selection => {
       // Within this loop:
       // - Build the encoding ssml text
       // - Build the safehtml css text to show colour
       p = p.substring(0, selection.caretStart + litter) +
-        selection.css + p.substring(selection.caretEnd + litter);
+        selection.ssml + p.substring(selection.caretEnd + litter);
 
       litter = litter + selection.litter;
+
+      css = css.substring(0, selection.caretStart + csslitter) +
+      selection.css + css.substring(selection.caretEnd + csslitter);
+
+      csslitter = csslitter + selection.csslitter;
+
     });
-    this.paintText = this.sanitizer.bypassSecurityTrustHtml(p);
+    this.paintText = this.sanitizer.bypassSecurityTrustHtml(css);
 
     localStorage.setItem('encodingText', this.encodingText);
 
+    this.pollyservice.updateText('<speak>' + p + '</speak>');
     return p;
   }
 

@@ -53,4 +53,9 @@ export class PollyTag {
     public litter(): number {
         return this._preTag.length + this._postTag.length;
     }
+
+    public csslitter(): number {
+        const len = '<span style="background-color:#' + this.color + ';">' + '</span>';
+        return len.length;
+    }
 }
