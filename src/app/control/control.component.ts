@@ -51,6 +51,9 @@ export class ControlComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+    this.selectedVoice = 'Emma';
+    this.pollyservice.updateVoice('Emma');
+
     this.breakSliderMode = 's';
     this.breakSliderStep = 1;
     this.breakSliderMin = 0;

@@ -67,13 +67,15 @@ export class TextComponent implements OnInit, OnDestroy {
   }
 
   updateText(oField: any) {
-    this.addTag(oField);
-    // this.pollyservice.updateText(this.encodingText);
+    this.addTags();
+    // this.pollyservice.updateText(this.encodingText); - will remove ssml?
+    console.log(this.encodingText);
   }
 
   onChange(deviceValue: TextPreset) {
     this.selectedTextPreset = deviceValue;
     this.encodingText = this.selectedTextPreset.text;
+    this.addTags();
   }
 
   /**
@@ -91,6 +93,9 @@ export class TextComponent implements OnInit, OnDestroy {
           dif = this.selections[this.selections.length - 1].caretEnd;
         }
 
+        // dif needs to figure out if the selection is before
+        // else minus it
+
         selection = new PollySelection((window.getSelection().anchorOffset + dif),
         window.getSelection().focusOffset + dif
           , window.getSelection().toString());
@@ -99,6 +104,7 @@ export class TextComponent implements OnInit, OnDestroy {
           , window.getSelection().toString());
       }
 
+      console.log(selection.caretStart, selection.caretEnd);
       selection.ssml = this.encodingTag.wrap(window.getSelection().toString());
       selection.css = this.encodingTag.paint(window.getSelection().toString());
       selection.litter = this.encodingTag.litter();
@@ -106,9 +112,9 @@ export class TextComponent implements OnInit, OnDestroy {
 
       let error = false;
       this.selections.forEach(idx => {
+        console.log(idx.caretStart, idx.caretEnd, selection.caretStart, selection.caretEnd);
         if (selection.overrides(idx) || selection.overlaps(idx)) {
           console.log('Error');
-          console.log(idx.caretStart, idx.caretEnd, selection.caretStart, selection.caretEnd);
           error = true;
           return;
         }
