@@ -104,6 +104,11 @@ export class TextComponent implements OnInit, OnDestroy {
           , window.getSelection().toString());
       }
 
+      if (selection.caretEnd < selection.caretStart) {
+        const temp = selection.caretStart;
+        selection.caretStart = selection.caretEnd;
+        selection.caretEnd = temp;
+      }
       console.log(selection.caretStart, selection.caretEnd);
       selection.ssml = this.encodingTag.wrap(window.getSelection().toString());
       selection.css = this.encodingTag.paint(window.getSelection().toString());

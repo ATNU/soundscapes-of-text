@@ -47,6 +47,14 @@ export class PollySelection {
         return this._caretEnd;
     }
 
+    public set caretStart(start: number)  {
+        this._caretStart = start;
+    }
+
+    public set caretEnd(end: number) {
+        this._caretEnd = end;
+    }
+
     public get range(): string {
         return this._range;
     }
