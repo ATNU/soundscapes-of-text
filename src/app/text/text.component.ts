@@ -27,6 +27,7 @@ export class TextComponent implements OnInit, OnDestroy {
   encodingTag: PollyTag;
   encodingTagSubscription: Subscription;
 
+  lastSelection: PollySelection;
   selections = Array<PollySelection>();
 
   constructor(private pollyservice: PollyService, private sanitizer: DomSanitizer) {
@@ -90,15 +91,21 @@ export class TextComponent implements OnInit, OnDestroy {
       if (oField.selectionStart === undefined && oField.selectionEnd === undefined ) {
         let dif = 0;
         if (this.selections.length > 0) {
-          dif = this.selections[this.selections.length - 1].caretEnd;
+          dif = this.lastSelection.caretEnd;
         }
-
-        // dif needs to figure out if the selection is before
-        // else minus it
-
         selection = new PollySelection((window.getSelection().anchorOffset + dif),
-        window.getSelection().focusOffset + dif
-          , window.getSelection().toString());
+        window.getSelection().focusOffset + dif, window.getSelection().toString());
+
+        const posSelect = this.encodingText.substring(selection.caretStart, selection.caretEnd);
+
+        if (selection.range !== posSelect && this.selections.length > 0) {
+          console.log('In');
+          selection.caretStart = selection.caretStart - this.lastSelection.caretEnd;
+          selection.caretEnd = selection.caretEnd - this.lastSelection.caretEnd;
+          console.log('last', this.lastSelection.caretStart, this.lastSelection.caretEnd);
+          console.log(selection.caretStart, selection.caretEnd);
+          console.log('end');
+        }
       } else {
         selection = new PollySelection(oField.selectionStart, oField.selectionEnd
           , window.getSelection().toString());
@@ -109,7 +116,7 @@ export class TextComponent implements OnInit, OnDestroy {
         selection.caretStart = selection.caretEnd;
         selection.caretEnd = temp;
       }
-      console.log(selection.caretStart, selection.caretEnd);
+      console.log('Final values', selection.caretStart, selection.caretEnd);
       selection.ssml = this.encodingTag.wrap(window.getSelection().toString());
       selection.css = this.encodingTag.paint(window.getSelection().toString());
       selection.litter = this.encodingTag.litter();
@@ -121,11 +128,13 @@ export class TextComponent implements OnInit, OnDestroy {
         if (selection.overrides(idx) || selection.overlaps(idx)) {
           console.log('Error');
           error = true;
+          this.lastSelection = selection;
           return;
         }
       });
       if (!error) {
         this.selections.push(selection);
+        this.lastSelection = selection;
         this.addTags();
         console.log(this.selections);
       }
@@ -138,15 +147,26 @@ export class TextComponent implements OnInit, OnDestroy {
    * @returns string input text with ssml tags included
    */
   addTags(): string {
+    this.selections.sort((ls, rs): number => {
+      if (ls.caretStart > rs.caretStart) {
+        console.log(ls.caretStart, 'selectedLarger', rs.caretStart);
+        return 1;
+      }
+      if (ls.caretStart < rs.caretStart) {
+        console.log(ls.caretStart, 'selectedLess', rs.caretStart);
+        return -1;
+      }
+      console.log(this.selections);
+      return 0;
+    });
+
     let p = this.encodingText;
     let css = this.encodingText;
 
     let litter = 0;
     let csslitter = 0;
     this.selections.forEach(selection => {
-      // Within this loop:
-      // - Build the encoding ssml text
-      // - Build the safehtml css text to show colour
+
       p = p.substring(0, selection.caretStart + litter) +
         selection.ssml + p.substring(selection.caretEnd + litter);
 
@@ -171,3 +191,4 @@ export class TextComponent implements OnInit, OnDestroy {
     this.paintText = this.encodingText;
   }
 }
+// Dif is the problem in this case...
