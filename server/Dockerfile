@@ -18,5 +18,6 @@ FROM scratch
 
 COPY --from=builder /app ./
 COPY ./server/.cfg.json ./
+COPY ./server/.aws ~/
 
 ENTRYPOINT [ "./app" ]

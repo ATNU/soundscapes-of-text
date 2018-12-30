@@ -1,0 +1,6 @@
+.idea
+.vscode
+
+server/assets
+server/polly
+server/.aws
