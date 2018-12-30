@@ -4,7 +4,7 @@ import env from './.env';
 export const environment = {
   production: true,
   version: env.npm_package_version,
-  serverUrl: 'http://localhost:4200',
+  serverUrl: 'http://atnu.di-projects.net:4200',
   defaultLanguage: 'en-US',
   supportedLanguages: [
     'en-US',
