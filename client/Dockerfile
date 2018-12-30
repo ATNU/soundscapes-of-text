@@ -2,11 +2,11 @@ FROM node as builder
 
 WORKDIR /app
 
-COPY package*.json /app/
+COPY ./client/package*.json /app/
 
 RUN npm install
 
-COPY ./ /app/
+COPY ./client /app/
 
 ARG configuration=production
 
@@ -17,4 +17,4 @@ FROM nginx:latest
 
 COPY --from=builder /app/dist/out /usr/share/nginx/html
 
-COPY ./nginx-custom.conf /etc/nginx/conf.d/default.conf
+COPY ./client/nginx-custom.conf /etc/nginx/conf.d/default.conf
