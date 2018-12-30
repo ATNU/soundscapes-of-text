@@ -1,0 +1,28 @@
+{
+    "voice": "Justin",
+    "input": "sample-text.xml",
+    "outputType": "mp3",
+    "assets": {
+        "demoPath": "assets/demo",
+        "ttsPath": "assets/tts",
+        "tagsPath": "assets/tag"
+    },
+    "webserver": {
+        "addr": "0.0.0.0:8080",
+        "clientAddr": "*",
+        "timeout": {
+            "write": 15,
+            "read": 15,
+            "idle": 60,
+            "cancel": 60 
+        }
+    },
+    "s3": {
+        "bucketName": "atnu.soundscapes",
+        "outputFormat": "mp3",
+        "maxRetryCount": 10
+    },
+    "sns": {
+        "pollyTopicName": "arn:aws:sns:us-east-1:438791141487:Polly"
+    }
+}
