@@ -1,0 +1,53 @@
+.container {
+  text-align: center;
+  padding: 1em;
+}
+
+.logo {
+  width: 150px;
+  margin: 0 auto;
+}
+
+q {
+  font-style: italic;
+  quotes: "« " " »";
+}
+
+.mat-card.text-card {
+  width: calc(100% - 50px);
+  /* height is 100% - height of harder card (115px) - height of collapsed calendar card (135px) */
+  height: calc(100% - 250px);
+  margin: 25px auto;
+  padding: 0;
+
+  &.fxClass-xs,
+  &.fxClass-sm {
+    width: calc(100% - 20px);
+    height: calc(100% - 185px);
+    margin: 10px auto;
+  }
+
+  app-text, app-control {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.mat-card.encoding-card {
+  width: calc(100% - 50px);
+  margin: 25px auto;
+  padding: 0;
+  background-color: rgb(72, 145, 220);
+
+  &.fxClass-xs,
+  &.fxClass-sm {
+    width: calc(100% - 20px);
+    margin: 10px auto;
+  }
+
+  app-encoding {
+    width: 100%;
+    height: 100%;
+  }
+}

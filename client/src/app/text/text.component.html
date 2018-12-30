@@ -1,0 +1,37 @@
+<mat-accordion>
+  <mat-expansion-panel [expanded]="step ===0" hideToggle>
+    <mat-expansion-panel-header>
+      <mat-panel-title>
+        Input Text
+      </mat-panel-title>
+    </mat-expansion-panel-header>
+    <mat-form-field>
+      <mat-select placeholder="Select Preset" [ngModel]="selectedTextPreset" (ngModelChange)="onChange($event)">
+        <mat-option *ngFor="let text of textPresets" [value]="text">
+          {{text.name}}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field dividerColor="primary" appearance="outline">
+      <mat-label>Insert your text here</mat-label>
+      <textarea matInput matTextareaAutosize matAutosizeMinRows="20" #textInput (mouseup)="updateText(textInput)" (keyup)="updateText(textInput)"
+        [(ngModel)]="encodingText" placeholder="Text to encode">
+        </textarea>
+    </mat-form-field>
+    <mat-action-row>
+      <button mat-button color="primary" (click)="nextStep()">Next</button>
+    </mat-action-row>
+  </mat-expansion-panel>
+  <mat-expansion-panel [expanded]="step === 1" hideToggle>
+    <mat-expansion-panel-header>
+      <mat-panel-title>
+        Paint Text
+      </mat-panel-title>
+    </mat-expansion-panel-header>
+    <p class="painter" [innerHTML]="paintText" #paintInput (mouseup)="addTag(paintInput)"></p>
+    <mat-action-row>
+      <button mat-button color="warn" (click)="resetPaint()">Reset</button>
+      <button mat-button color="primary" (click)="prevStep()">Previous</button>
+    </mat-action-row>
+  </mat-expansion-panel>
+</mat-accordion>

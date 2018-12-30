@@ -1,0 +1,22 @@
+<div class="container">
+  <mat-card>
+    <h1>
+      <mat-card-title translate>APP_NAME</mat-card-title>
+    </h1>
+    <mat-card-content>
+      <mat-icon>code</mat-icon>
+      <span translate>Version</span> {{version}}
+      <h2>
+        This pilot supports an application to the AHRC for two project: ‘Soundscapes of Texts’/ Thomas Nashe Project follow on funding.
+      </h2>
+      <mat-list>
+        <h3 mat-subheader>Aims</h3>
+        <mat-list-item *ngFor="let aim of aims">
+          <mat-icon mat-list-icon>{{aim.number}}</mat-icon>
+          <h4 mat-line>{{aim.name}}</h4>
+        </mat-list-item>
+        <mat-divider></mat-divider>
+      </mat-list>
+    </mat-card-content>
+  </mat-card>
+</div>
