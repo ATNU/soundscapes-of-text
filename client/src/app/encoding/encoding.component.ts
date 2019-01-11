@@ -34,7 +34,7 @@ export class EncodingComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.sources = new Array<Object>();
     this.sources.push({
-      src: 'https://s3-us-west-2.amazonaws.com/uk.ac.ncl.atnu.sot.output/16f4e11e-658b-4c9a-a1e8-e24cc54b4fc8.mp3',
+      src: 'https://s3-eu-west-1.amazonaws.com/atnu.soundscapes/bfeeb015-d93f-4961-ae77-61dbdd700e0d.mp3',
       type: 'audio/mpeg'
     });
     this.progressbarMode = 'determinate';
