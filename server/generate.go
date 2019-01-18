@@ -2,15 +2,17 @@ package main
 
 import (
 	"fmt"
+	"io"
+	"io/ioutil"
+	"log"
+	"os"
+	"path"
+	"time"
+
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/polly"
 	"github.com/aws/aws-sdk-go/service/polly/pollyiface"
 	"github.com/spf13/viper"
-	"io"
-	"io/ioutil"
-	"os"
-	"path"
-	"time"
 )
 
 // Generate creates a text-to-speech encoding of the provided body of text
@@ -34,16 +36,19 @@ func Generate(body, id, path string, svc pollyiface.PollyAPI) (*os.File, error) 
 
 	output, err := svc.SynthesizeSpeech(input)
 	if err != nil {
+		log.Println("37 " + err)
 		return nil, err
 	}
 
 	outFile, err := os.Create(path + ".mp3")
 	if err != nil {
+		log.Println("43 " + err)
 		return nil, err
 	}
 
 	_, err = io.Copy(outFile, output.AudioStream)
 	if err != nil {
+		log.Println("49 " + err)
 		return nil, err
 	}
 	return outFile, nil
