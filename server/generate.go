@@ -36,19 +36,22 @@ func Generate(body, id, path string, svc pollyiface.PollyAPI) (*os.File, error) 
 
 	output, err := svc.SynthesizeSpeech(input)
 	if err != nil {
-		log.Println("37 " + err)
+		log.Println("37 ")
+		log.Println(err)
 		return nil, err
 	}
 
 	outFile, err := os.Create(path + ".mp3")
 	if err != nil {
-		log.Println("43 " + err)
+		log.Println("43 ")
+		log.Println(err)
 		return nil, err
 	}
 
 	_, err = io.Copy(outFile, output.AudioStream)
 	if err != nil {
-		log.Println("49 " + err)
+		log.Println("49")
+		log.Println(err)
 		return nil, err
 	}
 	return outFile, nil
