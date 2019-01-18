@@ -73,7 +73,7 @@ func HandleDemo(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		f, err := Generate(("<speak>Hi my name is " + mux.Vars(r)["id"] + "</speak>"), mux.Vars(r)["id"],
+		f, err := Generate(("Hi my name is " + mux.Vars(r)["id"]), mux.Vars(r)["id"],
 			path.Join(viper.GetString("assets.demoPath"), mux.Vars(r)["id"]), p)
 		if err != nil {
 			log.Println(err)
