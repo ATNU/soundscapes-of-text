@@ -3,10 +3,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/polly"
-	"github.com/gorilla/mux"
-	"github.com/spf13/viper"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -14,6 +10,11 @@ import (
 	"path"
 	"strconv"
 	"time"
+
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/polly"
+	"github.com/gorilla/mux"
+	"github.com/spf13/viper"
 )
 
 var sess = session.Must(session.NewSessionWithOptions(session.Options{
@@ -64,6 +65,14 @@ func HandleDemo(w http.ResponseWriter, r *http.Request) {
 	var err error
 	if fi, err = os.Stat(path.Join(viper.GetString("assets.demoPath"), vars["id"]) + ".mp3"); os.IsNotExist(err) {
 		log.Println("INFO: No demo cache available - generating one")
+
+		err := os.MkdirAll(viper.GetString("assets.demoPath"), 0700)
+		if err != nil {
+			log.Println(err)
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+
 		f, err := Generate(("<speak>Hi my name is " + mux.Vars(r)["id"] + "</speak>"), mux.Vars(r)["id"],
 			path.Join(viper.GetString("assets.demoPath"), mux.Vars(r)["id"]), p)
 		if err != nil {
