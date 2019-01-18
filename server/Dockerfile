@@ -2,6 +2,8 @@ FROM golang:latest as builder
 
 WORKDIR /go/src/webserver
 
+RUN apk update && apk add ca-certificates git && rm -rf /var/cache/apk/*
+
 RUN go get github.com/spf13/viper &&        \
     go get github.com/gorilla/mux &&        \
     go get github.com/fsnotify/fsnotify &&  \
