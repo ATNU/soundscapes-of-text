@@ -1,4 +1,5 @@
 import { Component, OnInit, OnDestroy, ViewEncapsulation } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { PollyService } from '@app/shared/polly/polly.service';
 import { PollySelection } from '@app/shared/polly/polly-selection';
 import { TextPreset } from '@app/shared/polly/text-preset';
@@ -15,6 +16,8 @@ import { DomSanitizer, SafeHtml } from '../../../node_modules/@angular/platform-
 })
 export class TextComponent implements OnInit, OnDestroy {
 
+  textFormGroup: FormGroup;
+
   selectedTextPreset: TextPreset;
   textPresets: TextPreset[] = Array<TextPreset>();
 
@@ -30,7 +33,7 @@ export class TextComponent implements OnInit, OnDestroy {
   lastSelection: PollySelection;
   selections = Array<PollySelection>();
 
-  constructor(private pollyservice: PollyService, private sanitizer: DomSanitizer) {
+  constructor(private pollyservice: PollyService, private sanitizer: DomSanitizer, private formBuilder: FormBuilder) {
     this.encodingTextSubscription = pollyservice.encodingTextUpdate$.subscribe(encodingText => {
       // this.encodingText = encodingText;
     });
@@ -51,6 +54,11 @@ export class TextComponent implements OnInit, OnDestroy {
       this.selections = JSON.parse(localStorage.getItem('selections'));
     }
     */
+
+   this.textFormGroup = this.formBuilder.group({
+    textPreset: [''],
+    textInput: ['', Validators.required]
+  });
 
   }
 
@@ -74,8 +82,14 @@ export class TextComponent implements OnInit, OnDestroy {
   }
 
   onChange(deviceValue: TextPreset) {
+
+    console.log(deviceValue);
+    console.log(this.selectedTextPreset);
+
     this.selectedTextPreset = deviceValue;
-    this.encodingText = this.selectedTextPreset.text;
+    if (this.selectedTextPreset) {
+      this.encodingText = this.selectedTextPreset.text;
+    }
     this.addTags();
   }
 

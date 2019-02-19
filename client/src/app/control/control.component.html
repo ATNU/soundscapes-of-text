@@ -1,123 +1,95 @@
-<mat-tab-group class="mnPollyAttr" selectedIndex="0">
-  <mat-tab label="Voice" class="voiceSelect">
-    <br>
-    <mat-form-field>
-      <mat-select class="lanSelect" placeholder="Language" [(value)]="selectedLanguage" matTooltip="Selected language must match input text">
-        <mat-option *ngFor="let language of languages" (click)="getVoices(language)" [value]="language">
-          {{language.name}}
-        </mat-option>
-      </mat-select>
-    </mat-form-field>
-    <br>
-    <br>
-    <ul class="voices">
-      <li *ngFor="let voice of pollyVoices" (click)="updateVoice(voice)">
-        <span class="languageCode">{{voice.LanguageCode}}</span>
-        <span class="gender {{voice.Gender}}">{{voice.Gender}}</span>
-        <span class="name {{isVoiceSelected(voice)}}">{{voice.Id}}</span>
-        <button class="play" (click)="play(voice)">
-          <i class="material-icons">play_circle_outline</i>
-        </button>
-      </li>
-    </ul>
-  </mat-tab>
-  <mat-tab label="Tags">
-    <mat-button-toggle-group name="tagSelect" aria-label="Tag Select">
-      <mat-card class="example-card">
-        <mat-card-header>
-          <mat-card-title matTooltip="Remove a Tag">Eraser</mat-card-title>
-        </mat-card-header>
-        <mat-card-content>
-          <p class="eraserColor"></p>
-        </mat-card-content>
-        <mat-card-actions>
-          <button class="TagButton" mat-button (click)="updateEncodingTag($event,'eraser')">{{isBrushSelected('eraser')}}</button>
-        </mat-card-actions>
-      </mat-card>
-      <mat-card class="example-card">
-        <mat-card-header>
-          <mat-card-title matTooltip="You can set a pause based on a specific length of time in seconds or milliseconds.">Break</mat-card-title>
-        </mat-card-header>
-        <mat-card-content>
-          <p class="breakColor"></p>
-          <mat-radio-group [(ngModel)]="breakSliderMode">
-            <mat-radio-button value="s" (change)="breakModeSwitch($event)">Seconds</mat-radio-button>
-            <mat-radio-button value="ms" (change)="breakModeSwitch($event)">Milliseconds</mat-radio-button>
-          </mat-radio-group>
-          <mat-slider [min]="breakSliderMin" [max]="breakSliderMax" [step]="breakSliderStep" thumbLabel="true" [(ngModel)]="breakValue"></mat-slider>
-        </mat-card-content>
-        <mat-card-actions>
-          <button class="TagButton" mat-button (click)="updateEncodingTag($event,'break')">{{isBrushSelected('break')}}</button>
-        </mat-card-actions>
-      </mat-card>
-      <mat-card class="example-card">
-        <mat-card-header>
-          <mat-card-title matTooltip="Emphasizing words changes the speaking rate and volume. More emphasis makes Amazon Polly speak the text louder and slower. Less emphasis makes it speak quieter and faster.">Emphasis</mat-card-title>
-        </mat-card-header>
-        <mat-card-content>
-          <p class="emphasisColor"></p>
-          <mat-radio-group [(ngModel)]="emphasisMode">
-            <mat-radio-button value="strong">Strong</mat-radio-button>
-            <mat-radio-button value="moderate">Moderate</mat-radio-button>
-            <mat-radio-button value="reduced">Reduced</mat-radio-button>
-          </mat-radio-group>
-        </mat-card-content>
-        <mat-card-actions>
-          <button class="strong" mat-button (click)="updateEncodingTag($event,'emphasis')">{{isBrushSelected('emphasis')}}</button>
-        </mat-card-actions>
-      </mat-card>
-      <mat-card class="example-card">
-        <mat-card-header>
-          <mat-card-title matTooltip="To control the volume, rate, or pitch of your selected voice, use the prosody tag.">Prosody</mat-card-title>
-        </mat-card-header>
-        <mat-card-content class="prosody">
-          <p class="prosodyColor"></p>
-          <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="space-evenly stretch" fxLayout.sm="column" ngClass.xs="fxClass-xs"
-            ngClass.sm="fxClass-sm">
-            <div fxFlex class="prosodyCard">
-              <mat-card class="example-card">
-                <mat-card-header>
-                  <mat-card-title matTooltip="Changes volume relative to the current level. A value of +0dB means no change, +6dB means approximately twice the current volume, and -6dB means approximately half the current volume.">Volume</mat-card-title>
-                </mat-card-header>
-                <mat-card-content>
 
-                  <mat-checkbox class="prosodyCheck" [(ngModel)]="volumeDefaultCheck">Default</mat-checkbox>
-                  <mat-slider min="-6" max="6" [disabled]="volumeDefaultCheck" step="1" thumbLabel="true" vertical="true" [(ngModel)]="volumeValue"></mat-slider>
-                </mat-card-content>
-              </mat-card>
-            </div>
-            <div fxFlex class="prosodyCard">
-              <mat-card class="example-card">
-                <mat-card-header>
-                  <mat-card-title matTooltip="A non-negative percentage change in the speaking rate. For example, a value of 100% means no change in speaking rate, a value of 200% means a speaking rate twice the default rate, and a value of 50% means a speaking rate of half the default rate. This value has a range of 20-200%.">Rate</mat-card-title>
-                </mat-card-header>
-                <mat-card-content>
+<mat-button-toggle-group name="tagSelect" aria-label="Tag Select">
+  <mat-card class="example-card">
+    <mat-card-header>
+      <mat-card-title matTooltip="Remove a Tag">Eraser</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <p class="eraserColor"></p>
+    </mat-card-content>
+    <mat-card-actions>
+      <button class="TagButton" mat-button (click)="updateEncodingTag($event,'eraser')">{{isBrushSelected('eraser')}}</button>
+    </mat-card-actions>
+  </mat-card>
+  <mat-card class="example-card">
+    <mat-card-header>
+      <mat-card-title matTooltip="You can set a pause based on a specific length of time in seconds or milliseconds.">Break</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <p class="breakColor"></p>
+      <mat-radio-group [(ngModel)]="breakSliderMode">
+        <mat-radio-button value="s" (change)="breakModeSwitch($event)">Seconds</mat-radio-button>
+        <mat-radio-button value="ms" (change)="breakModeSwitch($event)">Milliseconds</mat-radio-button>
+      </mat-radio-group>
+      <mat-slider [min]="breakSliderMin" [max]="breakSliderMax" [step]="breakSliderStep" thumbLabel="true" [(ngModel)]="breakValue"></mat-slider>
+    </mat-card-content>
+    <mat-card-actions>
+      <button class="TagButton" mat-button (click)="updateEncodingTag($event,'break')">{{isBrushSelected('break')}}</button>
+    </mat-card-actions>
+  </mat-card>
+  <mat-card class="example-card">
+    <mat-card-header>
+      <mat-card-title matTooltip="Emphasizing words changes the speaking rate and volume. More emphasis makes Amazon Polly speak the text louder and slower. Less emphasis makes it speak quieter and faster.">Emphasis</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <p class="emphasisColor"></p>
+      <mat-radio-group [(ngModel)]="emphasisMode">
+        <mat-radio-button value="strong">Strong</mat-radio-button>
+        <mat-radio-button value="moderate">Moderate</mat-radio-button>
+        <mat-radio-button value="reduced">Reduced</mat-radio-button>
+      </mat-radio-group>
+    </mat-card-content>
+    <mat-card-actions>
+      <button class="strong" mat-button (click)="updateEncodingTag($event,'emphasis')">{{isBrushSelected('emphasis')}}</button>
+    </mat-card-actions>
+  </mat-card>
+  <mat-card class="example-card">
+    <mat-card-header>
+      <mat-card-title matTooltip="To control the volume, rate, or pitch of your selected voice, use the prosody tag.">Prosody</mat-card-title>
+    </mat-card-header>
+    <mat-card-content class="prosody">
+      <p class="prosodyColor"></p>
+      <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="space-evenly stretch" fxLayout.sm="column" ngClass.xs="fxClass-xs"
+        ngClass.sm="fxClass-sm">
+        <div fxFlex class="prosodyCard">
+          <mat-card class="example-card">
+            <mat-card-header>
+              <mat-card-title matTooltip="Changes volume relative to the current level. A value of +0dB means no change, +6dB means approximately twice the current volume, and -6dB means approximately half the current volume.">Volume</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
 
-                  <mat-checkbox class="prosodyCheck" [(ngModel)]="rateDefaultCheck">Default</mat-checkbox>
-                  <mat-slider min="20" max="200" [disabled]="rateDefaultCheck" step="1" thumbLabel="true" vertical="true" [(ngModel)]="rateValue"></mat-slider>
-                </mat-card-content>
-              </mat-card>
-            </div>
-            <div fxFlex class="prosodyCard">
-              <mat-card class="example-card">
-                <mat-card-header>
-                  <mat-card-title matTooltip="Adjusts pitch by a relative percentage. For example, a value of +0% means no baseline pitch change, +5% gives a little higher baseline pitch, and -5% results in a little lower baseline pitch.">Pitch</mat-card-title>
-                </mat-card-header>
-                <mat-card-content>
-                  <mat-checkbox class="prosodyCheck" [(ngModel)]="pitchDefaultCheck">Default</mat-checkbox>
-                  <mat-slider min="-100" max="100" [disabled]="pitchDefaultCheck" step="1" thumbLabel="true" vertical="true" [(ngModel)]="pitchValue"></mat-slider>
-                </mat-card-content>
-              </mat-card>
-            </div>
-          </div>
-        </mat-card-content>
-        <mat-card-actions>
-          <button mat-button (click)="updateEncodingTag($event,'prosody')">{{isBrushSelected('prosody')}}</button>
-        </mat-card-actions>
-      </mat-card>
-    </mat-button-toggle-group>
-  </mat-tab>
-  <mat-tab disabled label="Settings">
-    <p>Settings Tag</p>
-  </mat-tab>
-</mat-tab-group>
+              <mat-checkbox class="prosodyCheck" [(ngModel)]="volumeDefaultCheck">Default</mat-checkbox>
+              <mat-slider min="-6" max="6" [disabled]="volumeDefaultCheck" step="1" thumbLabel="true" vertical="true" [(ngModel)]="volumeValue"></mat-slider>
+            </mat-card-content>
+          </mat-card>
+        </div>
+        <div fxFlex class="prosodyCard">
+          <mat-card class="example-card">
+            <mat-card-header>
+              <mat-card-title matTooltip="A non-negative percentage change in the speaking rate. For example, a value of 100% means no change in speaking rate, a value of 200% means a speaking rate twice the default rate, and a value of 50% means a speaking rate of half the default rate. This value has a range of 20-200%.">Rate</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+
+              <mat-checkbox class="prosodyCheck" [(ngModel)]="rateDefaultCheck">Default</mat-checkbox>
+              <mat-slider min="20" max="200" [disabled]="rateDefaultCheck" step="1" thumbLabel="true" vertical="true" [(ngModel)]="rateValue"></mat-slider>
+            </mat-card-content>
+          </mat-card>
+        </div>
+        <div fxFlex class="prosodyCard">
+          <mat-card class="example-card">
+            <mat-card-header>
+              <mat-card-title matTooltip="Adjusts pitch by a relative percentage. For example, a value of +0% means no baseline pitch change, +5% gives a little higher baseline pitch, and -5% results in a little lower baseline pitch.">Pitch</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <mat-checkbox class="prosodyCheck" [(ngModel)]="pitchDefaultCheck">Default</mat-checkbox>
+              <mat-slider min="-100" max="100" [disabled]="pitchDefaultCheck" step="1" thumbLabel="true" vertical="true" [(ngModel)]="pitchValue"></mat-slider>
+            </mat-card-content>
+          </mat-card>
+        </div>
+      </div>
+    </mat-card-content>
+    <mat-card-actions>
+      <button mat-button (click)="updateEncodingTag($event,'prosody')">{{isBrushSelected('prosody')}}</button>
+    </mat-card-actions>
+  </mat-card>
+</mat-button-toggle-group>

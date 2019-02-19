@@ -1,4 +1,4 @@
-<div class="container">
+<!-- <div class="container">
   <mat-card class="text-card" fxLayout="row" fxLayout.xs="column" fxLayout.sm="column" ngClass.xs="fxClass-xs" ngClass.sm="fxClass-sm">
     <app-text></app-text>
     <app-control></app-control>
@@ -6,4 +6,27 @@
   <mat-card class="encoding-card" fxLayout="row" fxLayout.xs="row" fxLayout.sm="row" ngClass.sm="fxClass-sm">
       <app-encoding fxLayout="row"></app-encoding>
   </mat-card>
-</div>
+</div> -->
+
+<mat-horizontal-stepper [linear]="true" #stepper>
+  <mat-step>
+    <ng-template matStepLabel>Enter Text</ng-template>
+    <app-text></app-text>
+  </mat-step>
+  <mat-step>
+    <ng-template matStepLabel>Paint Text</ng-template>
+    <app-control></app-control>
+  </mat-step>
+  <mat-step>
+    <ng-template matStepLabel>Choose Voice</ng-template>
+    <app-voices></app-voices>
+  </mat-step>
+  <mat-step>
+    <ng-template matStepLabel>Playback</ng-template>
+    You are now done.
+    <div>
+      <button mat-button matStepperPrevious>Back</button>
+      <button mat-button (click)="stepper.reset()">Reset</button>
+    </div>
+  </mat-step>
+</mat-horizontal-stepper>
