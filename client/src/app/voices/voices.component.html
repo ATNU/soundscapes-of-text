@@ -1,0 +1,17 @@
+<mat-form-field>
+  <mat-select class="lanSelect" placeholder="Language" [(value)]="selectedLanguage" matTooltip="Selected language must match input text">
+    <mat-option *ngFor="let language of languages" (click)="getVoices(language)" [value]="language">
+      {{language.name}}
+    </mat-option>
+  </mat-select>
+</mat-form-field>
+<ul class="voices">
+  <li *ngFor="let voice of pollyVoices" (click)="updateVoice(voice)">
+    <span class="languageCode">{{voice.LanguageCode}}</span>
+    <span class="gender {{voice.Gender}}">{{voice.Gender}}</span>
+    <span class="name {{isVoiceSelected(voice)}}">{{voice.Id}}</span>
+    <button class="play" (click)="play(voice)">
+      <i class="material-icons">play_circle_outline</i>
+    </button>
+  </li>
+</ul>

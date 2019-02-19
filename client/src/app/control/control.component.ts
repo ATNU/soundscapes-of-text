@@ -1,7 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Subscription } from '../../../node_modules/rxjs';
-import { PollyVoice } from '@app/shared/polly/polly-voice';
-import { PollyLanguage } from '@app/shared/polly/polly-language';
 import { PollyTag } from '@app/shared/polly/polly-tag';
 import { PollyService } from '@app/shared/polly/polly.service';
 
@@ -12,9 +10,6 @@ import { PollyService } from '@app/shared/polly/polly.service';
   styleUrls: ['./control.component.scss']
 })
 export class ControlComponent implements OnInit, OnDestroy {
-
-  selectedVoice: string;
-
 
   breakSliderMode: string;
   breakSliderStep: number;
@@ -31,29 +26,16 @@ export class ControlComponent implements OnInit, OnDestroy {
   rateValue: number;
   pitchValue: number;
 
-  selectedLanguage: PollyLanguage;
-  languages: PollyLanguage[] = Array<PollyLanguage>();
-
-  pollyVoices: PollyVoice[] = Array<PollyVoice>();
-
-  encodingVoice: string;
-  encodingVoiceSubscription: Subscription;
   encodingTag: PollyTag;
   encodingTagSubscription: Subscription;
 
   constructor(private pollyservice: PollyService) {
-    this.encodingVoiceSubscription = pollyservice.encodingVoiceUpdate$.subscribe(encodingVoice => {
-      this.encodingVoice = encodingVoice;
-    });
     this.encodingTagSubscription = pollyservice.encodingTagUpdate$.subscribe(encodingTag => {
       this.encodingTag = encodingTag;
     });
   }
 
   ngOnInit() {
-    this.selectedVoice = 'Emma';
-    this.pollyservice.updateVoice('Emma');
-
     this.breakSliderMode = 's';
     this.breakSliderStep = 1;
     this.breakSliderMin = 0;
@@ -69,15 +51,10 @@ export class ControlComponent implements OnInit, OnDestroy {
     this.rateValue = 100;
     this.pitchValue = 0;
 
-    this.languages.push(new PollyLanguage('en-GB', 'English'));
-    this.languages.push(new PollyLanguage('en-US', 'American'));
-
-    this.getVoices(new PollyLanguage('en-GB', 'English British'));
     this.encodingTag = new PollyTag('', '', '', '');
   }
 
   ngOnDestroy() {
-    this.encodingVoiceSubscription.unsubscribe();
     this.encodingTagSubscription.unsubscribe();
   }
 
@@ -115,31 +92,6 @@ export class ControlComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Retreieve all AWS Polly voices available for selected language
-   * @param PollyLanguage language selected by user
-   */
-  getVoices(language: PollyLanguage) {
-    this.pollyVoices = [];
-    this.pollyservice.getVoices(language).subscribe(voices =>
-      voices.forEach(element => {
-        this.pollyVoices.push(element);
-      }));
-  }
-
-  /**
-   * Return if the provided voice is currently the selected voice
-   * Useful for CSS manipulation
-   * @param PollyVoice voice to query
-   * @returns string boolean if selected
-   */
-  isVoiceSelected(voice: PollyVoice): string {
-    if (this.selectedVoice === voice.Id) {
-      return 'selectedTrue';
-    }
-    return 'selectedFalse';
-  }
-
-  /**
    * Returns if the provided brush is currently the selected brush
    * Useful for CSS manipulation
    * @param string brush id
@@ -150,23 +102,6 @@ export class ControlComponent implements OnInit, OnDestroy {
       return 'Selected';
     }
     return 'Select';
-  }
-
-  /**
-   * Update the selected voice
-   * @param PollyVoice selected voice
-   */
-  updateVoice(voice: PollyVoice) {
-    this.selectedVoice = voice.Id;
-    this.pollyservice.updateVoice(voice.Id);
-  }
-
-  /**
-   * Retreive a demo audio clip of the selected voice
-   * @param PollyVoice voice selected by user
-   */
-  play(voice: PollyVoice) {
-    this.pollyservice.getDemo(voice);
   }
 
   /**
