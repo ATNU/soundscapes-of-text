@@ -8,7 +8,7 @@ import { SnackbarComponent } from '@app/home/snackbar/snackbar.component';
 import { PollyVoice } from '@app/shared/polly/polly-voice';
 import { PollyLanguage } from '@app/shared/polly/polly-language';
 import { PollyTag } from '@app/shared/polly/polly-tag';
-
+import { environment } from '@env/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -81,7 +81,8 @@ export class PollyService {
    */
   getDemo(voice: PollyVoice) {
     const audio = new Audio();
-    audio.src = `${this.demoUrl}/${voice.Id}`; // This overrides any http prefix intercepting unfortunately
+    // This overrides any http prefix intercepting unfortunately
+    audio.src = `${environment.serverUrl}${this.demoUrl}/${voice.Id}`;
     audio.load();
     audio.play();
   }
