@@ -244,6 +244,7 @@ export class ControlComponent implements OnInit, OnDestroy {
    * @param string name of ssml tag
    */
   updateEncodingTag(event: any, name: string) {
+    console.log(name);
     if (name === 'break') {
       const pre = '<break time="' + this.breakValue + this.breakSliderMode + '"/>';
       this.encodingTag = new PollyTag(name, 'e07575', pre, '');
