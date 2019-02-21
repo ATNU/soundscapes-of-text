@@ -1,4 +1,22 @@
-
+<div (textSelect)="renderRectangles( $event )" class="container">
+  <p>{{encodingText}}</p>
+  <div *ngIf="hostRectangle" class="indicator" [style.left.px]="hostRectangle.left" [style.top.px]="hostRectangle.top"
+    [style.width.px]="hostRectangle.width" [style.height.px]="0">
+    <div class="indicator__cta">
+      <!--
+                          NOTE: Because we DON'T WANT the selected text to get deselected
+                          when we click on the call-to-action, we have to PREVENT THE
+                          DEFAULT BEHAVIOR and STOP PROPAGATION on some of the events. The
+                          byproduct of this is that the (click) event won't fire. As such,
+                          we then have to consume the click-intent by way of the (mouseup)
+                          event.
+                      -->
+      <a (mousedown)="$event.preventDefault()" (mouseup)="$event.stopPropagation(); shareSelection()" class="indicator__cta-link">
+        Share With Friends
+      </a>
+    </div>
+  </div>
+</div>
 <mat-button-toggle-group name="tagSelect" aria-label="Tag Select">
   <mat-card class="example-card">
     <mat-card-header>
@@ -57,9 +75,9 @@
               <mat-card-title matTooltip="Changes volume relative to the current level. A value of +0dB means no change, +6dB means approximately twice the current volume, and -6dB means approximately half the current volume.">Volume</mat-card-title>
             </mat-card-header>
             <mat-card-content>
-
               <mat-checkbox class="prosodyCheck" [(ngModel)]="volumeDefaultCheck">Default</mat-checkbox>
-              <mat-slider min="-6" max="6" [disabled]="volumeDefaultCheck" step="1" thumbLabel="true" vertical="true" [(ngModel)]="volumeValue"></mat-slider>
+              <mat-slider min="-6" max="6" [disabled]="volumeDefaultCheck" step="1" thumbLabel="true" vertical="true"
+                [(ngModel)]="volumeValue"></mat-slider>
             </mat-card-content>
           </mat-card>
         </div>
@@ -69,9 +87,9 @@
               <mat-card-title matTooltip="A non-negative percentage change in the speaking rate. For example, a value of 100% means no change in speaking rate, a value of 200% means a speaking rate twice the default rate, and a value of 50% means a speaking rate of half the default rate. This value has a range of 20-200%.">Rate</mat-card-title>
             </mat-card-header>
             <mat-card-content>
-
               <mat-checkbox class="prosodyCheck" [(ngModel)]="rateDefaultCheck">Default</mat-checkbox>
-              <mat-slider min="20" max="200" [disabled]="rateDefaultCheck" step="1" thumbLabel="true" vertical="true" [(ngModel)]="rateValue"></mat-slider>
+              <mat-slider min="20" max="200" [disabled]="rateDefaultCheck" step="1" thumbLabel="true" vertical="true"
+                [(ngModel)]="rateValue"></mat-slider>
             </mat-card-content>
           </mat-card>
         </div>
@@ -82,7 +100,8 @@
             </mat-card-header>
             <mat-card-content>
               <mat-checkbox class="prosodyCheck" [(ngModel)]="pitchDefaultCheck">Default</mat-checkbox>
-              <mat-slider min="-100" max="100" [disabled]="pitchDefaultCheck" step="1" thumbLabel="true" vertical="true" [(ngModel)]="pitchValue"></mat-slider>
+              <mat-slider min="-100" max="100" [disabled]="pitchDefaultCheck" step="1" thumbLabel="true" vertical="true"
+                [(ngModel)]="pitchValue"></mat-slider>
             </mat-card-content>
           </mat-card>
         </div>
