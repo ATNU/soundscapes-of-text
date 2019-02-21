@@ -21,17 +21,11 @@ export class TextComponent implements OnInit, OnDestroy {
   selectedTextPreset: TextPreset;
   textPresets: TextPreset[] = Array<TextPreset>();
 
-  step = 0;
-  paintText: SafeHtml = 'Nothing here yet...';
-
   encodingText = '';
   encodingTextSubscription: Subscription;
 
   encodingTag: PollyTag;
   encodingTagSubscription: Subscription;
-
-  lastSelection: PollySelection;
-  selections = Array<PollySelection>();
 
   constructor(private pollyservice: PollyService, private sanitizer: DomSanitizer, private formBuilder: FormBuilder) {
     this.encodingTextSubscription = pollyservice.encodingTextUpdate$.subscribe(encodingText => {
@@ -67,142 +61,14 @@ export class TextComponent implements OnInit, OnDestroy {
     this.encodingTagSubscription.unsubscribe();
   }
 
-  nextStep() {
-    this.step++;
-  }
-
-  prevStep() {
-    this.step--;
-  }
-
   updateText(oField: any) {
-    this.addTags();
-    // this.pollyservice.updateText(this.encodingText); - will remove ssml?
-    console.log(this.encodingText);
+    this.pollyservice.updateText(this.encodingText);
   }
 
   onChange(deviceValue: TextPreset) {
-
-    console.log(deviceValue);
-    console.log(this.selectedTextPreset);
-
     this.selectedTextPreset = deviceValue;
     if (this.selectedTextPreset) {
       this.encodingText = this.selectedTextPreset.text;
     }
-    this.addTags();
-  }
-
-  /**
-   * Create a new local record of the user selected tag
-   * Ensure that this tag does not overlap or override any prexisting tags
-   * @param oField
-   */
-  addTag(oField: any) {
-    if (window.getSelection().toString() !== '' || oField.selectionStart === '0') {
-
-      let selection: PollySelection;
-      if (oField.selectionStart === undefined && oField.selectionEnd === undefined ) {
-        let dif = 0;
-        if (this.selections.length > 0) {
-          dif = this.lastSelection.caretEnd;
-        }
-        selection = new PollySelection((window.getSelection().anchorOffset + dif),
-        window.getSelection().focusOffset + dif, window.getSelection().toString());
-
-        const posSelect = this.encodingText.substring(selection.caretStart, selection.caretEnd);
-
-        if (selection.range !== posSelect && this.selections.length > 0) {
-          console.log('In');
-          selection.caretStart = selection.caretStart - this.lastSelection.caretEnd;
-          selection.caretEnd = selection.caretEnd - this.lastSelection.caretEnd;
-          console.log('last', this.lastSelection.caretStart, this.lastSelection.caretEnd);
-          console.log(selection.caretStart, selection.caretEnd);
-          console.log('end');
-        }
-      } else {
-        selection = new PollySelection(oField.selectionStart, oField.selectionEnd
-          , window.getSelection().toString());
-      }
-
-      if (selection.caretEnd < selection.caretStart) {
-        const temp = selection.caretStart;
-        selection.caretStart = selection.caretEnd;
-        selection.caretEnd = temp;
-      }
-      console.log('Final values', selection.caretStart, selection.caretEnd);
-      selection.ssml = this.encodingTag.wrap(window.getSelection().toString());
-      selection.css = this.encodingTag.paint(window.getSelection().toString());
-      selection.litter = this.encodingTag.litter();
-      selection.csslitter = this.encodingTag.csslitter();
-
-      let error = false;
-      this.selections.forEach(idx => {
-        console.log(idx.caretStart, idx.caretEnd, selection.caretStart, selection.caretEnd);
-        if (selection.overrides(idx) || selection.overlaps(idx)) {
-          console.log('Error');
-          error = true;
-          this.lastSelection = selection;
-          return;
-        }
-      });
-      if (!error) {
-        this.selections.push(selection);
-        this.lastSelection = selection;
-        this.addTags();
-        console.log(this.selections);
-      }
-    }
-  }
-
-  /**
-   * Add ssml tags to input text in preparation for sending
-   * to AWS Polly
-   * @returns string input text with ssml tags included
-   */
-  addTags(): string {
-    this.selections.sort((ls, rs): number => {
-      if (ls.caretStart > rs.caretStart) {
-        console.log(ls.caretStart, 'selectedLarger', rs.caretStart);
-        return 1;
-      }
-      if (ls.caretStart < rs.caretStart) {
-        console.log(ls.caretStart, 'selectedLess', rs.caretStart);
-        return -1;
-      }
-      console.log(this.selections);
-      return 0;
-    });
-
-    let p = this.encodingText;
-    let css = this.encodingText;
-
-    let litter = 0;
-    let csslitter = 0;
-    this.selections.forEach(selection => {
-
-      p = p.substring(0, selection.caretStart + litter) +
-        selection.ssml + p.substring(selection.caretEnd + litter);
-
-      litter = litter + selection.litter;
-
-      css = css.substring(0, selection.caretStart + csslitter) +
-      selection.css + css.substring(selection.caretEnd + csslitter);
-
-      csslitter = csslitter + selection.csslitter;
-
-    });
-    this.paintText = this.sanitizer.bypassSecurityTrustHtml(css);
-
-    localStorage.setItem('encodingText', this.encodingText);
-
-    this.pollyservice.updateText('<speak>' + p + '</speak>');
-    return p;
-  }
-
-  resetPaint() {
-    this.selections = [];
-    this.paintText = this.encodingText;
   }
 }
-// Dif is the problem in this case...
