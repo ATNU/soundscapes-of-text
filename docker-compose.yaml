@@ -1,0 +1,27 @@
+version: "3"
+services:
+  client:
+    image: atnu/soundscapes-client
+    build:
+      context: ./
+      dockerfile: client/Dockerfile
+    ports:
+      - "4100:80"
+    networks:
+      - soundscapes
+  server:
+    image: atnu/soundscapes-server
+    environment:
+        - AWS_DEFAULT_REGION=${REGION}
+        - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+        - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+    build:
+      context: ./
+      dockerfile: server/Dockerfile
+    ports:
+      - "4300:8080"
+    networks:
+      - soundscapes
+
+networks:
+  soundscapes:
