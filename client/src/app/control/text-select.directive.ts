@@ -12,6 +12,8 @@ import { NgZone } from '@angular/core';
 
 export interface TextSelectEvent {
     text: string;
+    start: number;
+    end: number;
     viewportRectangle: SelectionRectangle | null;
     hostRectangle: SelectionRectangle | null;
 }
@@ -185,6 +187,8 @@ export class TextSelectDirective implements OnInit, OnDestroy {
                     this.hasSelection = false;
                     this.textSelectEvent.next({
                         text: '',
+                        start: null,
+                        end: null,
                         viewportRectangle: null,
                         hostRectangle: null
                     });
@@ -222,6 +226,8 @@ export class TextSelectDirective implements OnInit, OnDestroy {
                     this.hasSelection = true;
                     this.textSelectEvent.emit({
                         text: selection.toString(),
+                        start: selection.anchorOffset < selection.extentOffset ? selection.anchorOffset : selection.extentOffset,
+                        end: selection.anchorOffset < selection.extentOffset ? selection.extentOffset : selection.anchorOffset,
                         viewportRectangle: {
                             left: viewportRectangle.left,
                             top: viewportRectangle.top,

@@ -1,22 +1,21 @@
 <mat-toolbar>
-  <button mat-icon-button (click)="updateEncodingTag($event,'break')">
-    <mat-icon>pause</mat-icon>
+  <button [ngClass]="{'selected': currentTag === 'break'}" mat-button (click)="updateEncodingTag($event,'break')">
+    <mat-icon>pause</mat-icon> Break
   </button>
-  <button mat-icon-button (click)="updateEncodingTag($event,'emphasis')">
-    <mat-icon>volume_up</mat-icon>
+  <button [ngClass]="{'selected': currentTag === 'emphasis'}" mat-button (click)="updateEncodingTag($event,'emphasis')">
+    <mat-icon>volume_up</mat-icon> Emphasis
   </button>
-  <button mat-icon-button (click)="updateEncodingTag($event,'prosody')">
-    <mat-icon>record_voice_over</mat-icon>
+  <button [ngClass]="{'selected': currentTag === 'prosody'}" mat-button (click)="updateEncodingTag($event,'prosody')">
+    <mat-icon>record_voice_over</mat-icon> Prosody
   </button>
-  <button mat-icon-button (click)="updateEncodingTag($event,'eraser')">
-    <mat-icon>delete</mat-icon>
+  <button [ngClass]="{'selected': currentTag === 'eraser'}" mat-button (click)="updateEncodingTag($event,'eraser')">
+    <mat-icon>delete</mat-icon> Clear
   </button>
 </mat-toolbar>
 
-<mat-card (textSelect)="renderRectangles( $event )" class="container">
-  <p>{{encodingText}}</p>
-  <div *ngIf="hostRectangle" class="indicator" [style.left.px]="hostRectangle.left" [style.top.px]="hostRectangle.top"
-    [style.width.px]="hostRectangle.width" [style.height.px]="0">
+<mat-card (textSelect)="renderRectangles( $event )" class="container" [ngClass]="currentTag">
+  <p [innerHtml]="paintText"></p>
+  <div *ngIf="hostRectangle" class="indicator" [style.left.px]="hostRectangle.left" [style.top.px]="hostRectangle.top" [style.width.px]="hostRectangle.width" [style.height.px]="0">
     <div class="indicator__cta">
       <!--
                           NOTE: Because we DON'T WANT the selected text to get deselected
@@ -26,8 +25,23 @@
                           we then have to consume the click-intent by way of the (mouseup)
                           event.
                       -->
-      <a (mousedown)="$event.preventDefault()" (mouseup)="$event.stopPropagation(); shareSelection()" class="indicator__cta-link">
-        Share With Friends
+      <a *ngIf="currentTag === 'break'" (mousedown)="$event.preventDefault()" (mouseup)="$event.stopPropagation();" class="indicator__cta-link">
+        <mat-radio-group [(ngModel)]="breakSliderMode">
+          <mat-radio-button value="s" (change)="breakModeSwitch($event)">Seconds</mat-radio-button>
+          <mat-radio-button value="ms" (change)="breakModeSwitch($event)">Milliseconds</mat-radio-button>
+        </mat-radio-group>
+        <mat-slider [min]="breakSliderMin" [max]="breakSliderMax" [step]="breakSliderStep" thumbLabel="true" [(ngModel)]="breakValue"></mat-slider>
+        <button class="TagButton" mat-button (mouseup)="cancel()">Cancel</button>
+        <button class="TagButton" mat-button (mouseup)="addTag()">Save</button>
+      </a>
+      <a *ngIf="currentTag === 'emphasis'" (mousedown)="$event.preventDefault()" (mouseup)="$event.stopPropagation()" class="indicator__cta-link">
+        Emphasis
+      </a>
+      <a *ngIf="currentTag === 'prosody'" (mousedown)="$event.preventDefault()" (mouseup)="$event.stopPropagation()" class="indicator__cta-link">
+        Prosody
+      </a>
+      <a *ngIf="currentTag === 'eraser'" (mousedown)="$event.preventDefault()" (mouseup)="$event.stopPropagation()" class="indicator__cta-link">
+        Eraser
       </a>
     </div>
   </div>

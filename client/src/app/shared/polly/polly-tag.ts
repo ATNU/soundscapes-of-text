@@ -43,7 +43,7 @@ export class PollyTag {
      * @returns string painted body of text
      */
     public paint(body: string): string {
-        return '<span style="background-color:#' + this.color + ';">' + body + '</span>';
+        return '<span class="' + this.color + '">' + body + '</span>';
     }
 
     /**
@@ -55,7 +55,7 @@ export class PollyTag {
     }
 
     public csslitter(): number {
-        const len = '<span style="background-color:#' + this.color + ';">' + '</span>';
+        const len = '<span class="' + this.color + '">' + '</span>';
         return len.length;
     }
 }

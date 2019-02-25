@@ -63,12 +63,40 @@ button :hover {
     color: rgb(95, 24, 153);
 }
 
-div.container {
-	position: relative ;
+mat-card.container {
+	position: relative;
+	padding-bottom: 300px;
+
+	break {
+		background-color: #e07575;
+	}
+
+	&.break {
+		.indicator__cta-link:after {
+			color: #e07575;
+		}
+	}
+
+	&.emphasis {
+		.indicator__cta-link:after {
+			color: #9175e0;
+		}
+	}
+
+	&.prosody {
+		.indicator__cta-link:after {
+			color: #c9e075;
+		}
+	}
+
+	&.eraser {
+		.indicator__cta-link:after {
+			color: #white;
+		}
+	}
 }
 
 .indicator {
-	background-color: fade( gold, 10% ) ;
 	position: absolute ;
 	z-index: 2 ;
 
@@ -79,36 +107,27 @@ div.container {
 	}
 
 	&__cta-link {
-		background-color: #333333 ;
+		background-color: #ffffff ;
 		border-radius: 5px 5px 5px 5px ;
-		bottom: 0px ;
-		box-shadow: 2px 2px 5px fade( #000000, 30% ) ;
-		color: #FFFFFF ;
+		top: 50px ;
+		box-shadow: 0 3px 1px -2px rgba(0,0,0,.2), 0 2px 2px 0 rgba(0,0,0,.14), 0 1px 5px 0 rgba(0,0,0,.12);
+		color: #2e2e2e ;
 		cursor: pointer ;
 		left: 0px ;
 		padding: 11px 22px 10px 22px ;
 		position: absolute ;
 		transform: translateX( -50% ) ;
-		white-space: nowrap ;
 
 		&:after {
-			bottom: -11px ;
+			top: -15px ;
 			font-size: 15px ;
 			left: 50% ;
 			line-height: 15px ;
 			content: "▼" ;
-			color: #333333 ;
+			color: #ffffff ;
 			position: absolute ;
 			transform: translateX( -50% ) ;
-		}
-
-		&:hover {
-			background-color: gold ;
-			color: #000000 ;
-
-			&:after {
-				color: gold ;
-			}
+			transform: rotate(180deg);
 		}
 	}
 }
