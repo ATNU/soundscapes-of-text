@@ -12,12 +12,9 @@ services:
   server:
     image: atnu/soundscapes-server
     environment:
-        # - AWS_DEFAULT_REGION=${REGION}
-        # - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
-        # - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
-        - AWS_DEFAULT_REGION=eu-west-1
-        - AWS_ACCESS_KEY_ID=AKIAJVRS2TYVUQZINKJQ
-        - AWS_SECRET_ACCESS_KEY=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
+        - AWS_DEFAULT_REGION=${REGION}
+        - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+        - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
     build:
       context: ./
       dockerfile: server/Dockerfile
