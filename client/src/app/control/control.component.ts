@@ -35,20 +35,18 @@ export class ControlComponent implements OnInit, OnDestroy {
     breakValue: number;
   };
 
-  breakSliderMode: string;
-  breakSliderStep: number;
-  breakSliderMin: number;
-  breakSliderMax: number;
-  breakValue: number;
+  emphasisConfig: {
+    emphasisMode: string;
+  };
 
-  emphasisMode: string;
-
-  volumeDefaultCheck: boolean;
-  rateDefaultCheck: boolean;
-  pitchDefaultCheck: boolean;
-  volumeValue: number;
-  rateValue: number;
-  pitchValue: number;
+  prosodyConfig: {
+    volumeDefaultCheck: boolean;
+    rateDefaultCheck: boolean;
+    pitchDefaultCheck: boolean;
+    volumeValue: number;
+    rateValue: number;
+    pitchValue: number;
+  };
 
   lastSelection: PollySelection;
   selections = Array<PollySelection>();
@@ -84,20 +82,18 @@ export class ControlComponent implements OnInit, OnDestroy {
       breakValue: 1
     };
 
-    this.breakSliderMode = 's';
-    this.breakSliderStep = 1;
-    this.breakSliderMin = 0;
-    this.breakSliderMax = 10;
-    this.breakValue = 1;
+    this.emphasisConfig = {
+      emphasisMode: 'moderate'
+    };
 
-    this.emphasisMode = 'moderate';
-
-    this.volumeDefaultCheck = true;
-    this.rateDefaultCheck = true;
-    this.pitchDefaultCheck = true;
-    this.volumeValue = 0;
-    this.rateValue = 100;
-    this.pitchValue = 0;
+    this.prosodyConfig = {
+      volumeDefaultCheck: true,
+      rateDefaultCheck: true,
+      pitchDefaultCheck:  true,
+      volumeValue: 0,
+      rateValue: 100,
+      pitchValue:  0
+    };
 
     this.encodingTag = new PollyTag('', '', '', '');
   }
@@ -106,7 +102,7 @@ export class ControlComponent implements OnInit, OnDestroy {
     this.encodingTagSubscription.unsubscribe();
   }
 
-  onBreakChange(event: any) {
+  onControlChange(event: any) {
     this.updateEncodingTag(null, this.currentTag);
   }
 
@@ -241,27 +237,33 @@ export class ControlComponent implements OnInit, OnDestroy {
    */
   updateEncodingTag(event: any, name: string) {
     this.currentTag = name;
+
+    console.group('Config');
     console.log(this.breakConfig);
+    console.log(this.emphasisConfig);
+    console.log(this.prosodyConfig);
+    console.groupEnd();
+
     if (name === 'break') {
       const pre = '<break time="' + this.breakConfig.breakValue + this.breakConfig.breakSliderMode + '">';
       const post = '</break>';
       this.encodingTag = new PollyTag(name, 'break', pre, post);
     }
     if (name === 'emphasis') {
-      const pre = '<emphasis level="' + this.emphasisMode + '">';
+      const pre = '<emphasis level="' + this.emphasisConfig.emphasisMode + '">';
       const post = '</emphasis>';
       this.encodingTag = new PollyTag(name, 'emphasis', pre, post);
     }
     if (name === 'prosody') {
       let pre = '<prosody';
-      if (this.volumeDefaultCheck === false) {
-        pre = pre + ' volume="' + this.volumeValue + '"';
+      if (this.prosodyConfig.volumeDefaultCheck === false) {
+        pre = pre + ' volume="' + this.prosodyConfig.volumeValue + '"';
       }
-      if (this.rateDefaultCheck === false) {
-        pre = pre + ' rate="' + this.rateValue + '"';
+      if (this.prosodyConfig.rateDefaultCheck === false) {
+        pre = pre + ' rate="' + this.prosodyConfig.rateValue + '"';
       }
-      if (this.pitchDefaultCheck === false) {
-        pre = pre + ' pitch="' + this.pitchValue + '"';
+      if (this.prosodyConfig.pitchDefaultCheck === false) {
+        pre = pre + ' pitch="' + this.prosodyConfig.pitchValue + '"';
       }
       pre = pre + '>';
       const post = '</prosody>';
@@ -290,14 +292,19 @@ export class ControlComponent implements OnInit, OnDestroy {
    */
   breakModeSwitch(event: any) {
     if (event.value === 's') {
-      this.breakSliderStep = 1;
-      this.breakSliderMin = 0;
-      this.breakSliderMax = 10;
+      this.breakConfig.breakSliderStep = 1;
+      this.breakConfig.breakSliderMin = 0;
+      this.breakConfig.breakSliderMax = 10;
     } else if (event.value === 'ms') {
-      this.breakSliderStep = 100;
-      this.breakSliderMin = 10;
-      this.breakSliderMax = 10000;
+      this.breakConfig.breakSliderStep = 100;
+      this.breakConfig.breakSliderMin = 10;
+      this.breakConfig.breakSliderMax = 10000;
     }
+  }
+
+  changeEmphasis(value: string) {
+    this.emphasisConfig.emphasisMode = value;
+    this.onControlChange(null);
   }
 
 }
