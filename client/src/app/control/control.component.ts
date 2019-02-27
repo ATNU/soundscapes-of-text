@@ -27,6 +27,14 @@ export class ControlComponent implements OnInit, OnDestroy {
   paintText: SafeHtml = '';
   currentTag: string;
 
+  breakConfig: {
+    breakSliderMode: string;
+    breakSliderStep: number;
+    breakSliderMin: number;
+    breakSliderMax: number;
+    breakValue: number;
+  };
+
   breakSliderMode: string;
   breakSliderStep: number;
   breakSliderMin: number;
@@ -68,11 +76,19 @@ export class ControlComponent implements OnInit, OnDestroy {
 
     this.currentTag = null;
 
+    this.breakConfig = {
+      breakSliderMode: 's',
+      breakSliderStep: 1,
+      breakSliderMin: 0,
+      breakSliderMax: 10,
+      breakValue: 1
+    };
+
     this.breakSliderMode = 's';
     this.breakSliderStep = 1;
     this.breakSliderMin = 0;
     this.breakSliderMax = 10;
-    this.breakValue = 0;
+    this.breakValue = 1;
 
     this.emphasisMode = 'moderate';
 
@@ -88,6 +104,10 @@ export class ControlComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.encodingTagSubscription.unsubscribe();
+  }
+
+  onBreakChange(event: any) {
+    this.updateEncodingTag(null, this.currentTag);
   }
 
   // ---
@@ -221,8 +241,9 @@ export class ControlComponent implements OnInit, OnDestroy {
    */
   updateEncodingTag(event: any, name: string) {
     this.currentTag = name;
+    console.log(this.breakConfig);
     if (name === 'break') {
-      const pre = '<break time="' + this.breakValue + this.breakSliderMode + '">';
+      const pre = '<break time="' + this.breakConfig.breakValue + this.breakConfig.breakSliderMode + '">';
       const post = '</break>';
       this.encodingTag = new PollyTag(name, 'break', pre, post);
     }

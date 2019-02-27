@@ -30,11 +30,12 @@
           <mat-radio-button value="s" (change)="breakModeSwitch($event)">Seconds</mat-radio-button>
           <mat-radio-button value="ms" (change)="breakModeSwitch($event)">Milliseconds</mat-radio-button>
         </mat-radio-group>
-        <mat-slider [min]="breakSliderMin" [max]="breakSliderMax" [step]="breakSliderStep" thumbLabel="true" [(ngModel)]="breakValue"></mat-slider>
+        <mat-slider [min]="breakConfig.breakSliderMin" [max]="breakConfig.breakSliderMax" [step]="breakConfig.breakSliderStep" [thumbLabel]="true" [(ngModel)]="breakConfig.breakValue" (change)="onBreakChange($event)"></mat-slider>
         <button class="TagButton" mat-button (mouseup)="cancel()">Cancel</button>
         <button class="TagButton" mat-button (mouseup)="addTag()">Save</button>
+        <pre>{{breakConfig.breakValue}}</pre>
       </a>
-      <a *ngIf="currentTag === 'emphasis'" (mousedown)="$event.preventDefault()" (mouseup)="$event.stopPropagation()" class="indicator__cta-link">
+      <a *ngIf="currentTag == 'emphasis'" (mousedown)="$event.preventDefault()" (mouseup)="$event.stopPropagation()" class="indicator__cta-link">
         <mat-radio-group [(ngModel)]="emphasisMode">
           <mat-radio-button value="strong">Strong</mat-radio-button>
           <mat-radio-button value="moderate">Moderate</mat-radio-button>
@@ -43,12 +44,12 @@
         <button class="TagButton" mat-button (mouseup)="cancel()">Cancel</button>
         <button class="TagButton" mat-button (mouseup)="addTag()">Save</button>
       </a>
-      <a *ngIf="currentTag === 'prosody'" (mousedown)="$event.preventDefault()" (mouseup)="$event.stopPropagation()" class="indicator__cta-link">
+      <a *ngIf="currentTag == 'prosody'" (mousedown)="$event.preventDefault()" (mouseup)="$event.stopPropagation()" class="indicator__cta-link">
         <mat-slider min="-6" max="6" [disabled]="volumeDefaultCheck" step="1" thumbLabel="true" [(ngModel)]="volumeValue"></mat-slider>
         <mat-slider min="20" max="200" [disabled]="rateDefaultCheck" step="1" thumbLabel="true" [(ngModel)]="rateValue"></mat-slider>
         <mat-slider min="-100" max="100" [disabled]="pitchDefaultCheck" step="1" thumbLabel="true" [(ngModel)]="pitchValue"></mat-slider>
       </a>
-      <a *ngIf="currentTag === 'eraser'" (mousedown)="$event.preventDefault()" (mouseup)="$event.stopPropagation()" class="indicator__cta-link">
+      <a *ngIf="currentTag == 'eraser'" (mousedown)="$event.preventDefault()" (mouseup)="$event.stopPropagation()" class="indicator__cta-link">
         <button class="TagButton" mat-button (mouseup)="cancel()">Cancel</button>
         <button class="TagButton" mat-button (mouseup)="cancel()">Erase</button>
       </a>
