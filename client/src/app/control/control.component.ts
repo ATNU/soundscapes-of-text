@@ -66,7 +66,7 @@ export class ControlComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
 
-    this.currentTag = 'break';
+    this.currentTag = null;
 
     this.breakSliderMode = 's';
     this.breakSliderStep = 1;
@@ -97,14 +97,6 @@ export class ControlComponent implements OnInit, OnDestroy {
   // I render the rectangles emitted by the [textSelect] directive.
   public renderRectangles(event: TextSelectEvent): void {
 
-    // console.group('Text Select Event');
-    // console.log('Text:', event.text);
-    // console.log('Start:', event.start);
-    // console.log('End:', event.end);
-    // console.log('Viewport Rectangle:', event.viewportRectangle);
-    // console.log('Host Rectangle:', event.hostRectangle);
-    // console.groupEnd();
-
     // If a new selection has been created, the viewport and host rectangles will
     // exist. Or, if a selection is being removed, the rectangles will be null.
     if (event.hostRectangle) {
@@ -122,13 +114,7 @@ export class ControlComponent implements OnInit, OnDestroy {
 
   }
 
-
-  // I share the selected text with friends :)
   public cancel(): void {
-
-    console.group('Shared Text');
-    console.log(this.selectedText);
-    console.groupEnd();
 
     // Now that we've shared the text, let's clear the current selection.
     document.getSelection().removeAllRanges();
@@ -151,13 +137,12 @@ export class ControlComponent implements OnInit, OnDestroy {
 
       let selection: PollySelection;
 
-      console.log(this.selectionBounds);
-
       const start = this.selectionBounds[0],
           end = this.selectionBounds[1],
           range = (end - start).toString();
 
       selection = new PollySelection(start, end, range);
+      selection.tag = this.encodingTag;
       selection.ssml = this.encodingTag.wrap(this.selectedText);
       selection.css = this.encodingTag.paint(this.selectedText);
       selection.litter = this.encodingTag.litter();
@@ -207,36 +192,24 @@ export class ControlComponent implements OnInit, OnDestroy {
       return 0;
     });
 
-    console.log(this.selections);
-
     let text = String(this.encodingText).replace(/<[^>]+>/gm, '');
     text = '<speak>' + text + '</speak>';
     let offset = 7;
 
     this.selections.forEach(selection => {
-      console.group('Selection Offset');
-      console.log('Offset: ' + offset);
-      console.log('Start: ' + selection.caretStart);
-      console.log('True Start: ' + (offset + selection.caretStart));
-      console.log('SSML: ' + selection.ssml.length);
-      console.log('Litter: ' + selection.litter);
-      console.log('Text: ' + Number(selection.range));
-      console.log(text.substring(offset + selection.caretStart, offset + selection.caretEnd));
-      console.groupEnd();
+
       text = [
         text.slice(0, (selection.caretStart + offset)),
         selection.ssml,
         text.slice(selection.caretEnd + offset)]
         .join('');
-      offset = offset + (selection.ssml.length - Number(selection.range));
+      offset = offset + selection.litter;
     });
 
     this.paintText = this.sanitizer.bypassSecurityTrustHtml(text);
 
     this.pollyservice.updateText(text);
     localStorage.setItem('encodingText', this.encodingText);
-
-    console.log(this.encodingText);
 
     return this.encodingText;
   }
@@ -273,6 +246,7 @@ export class ControlComponent implements OnInit, OnDestroy {
       const post = '</prosody>';
       this.encodingTag = new PollyTag(name, 'prosody', pre, post);
     }
+
     this.pollyservice.updateTag(this.encodingTag);
   }
 

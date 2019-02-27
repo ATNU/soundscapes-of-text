@@ -6,6 +6,7 @@ import { EventEmitter } from '@angular/core';
 import { OnDestroy } from '@angular/core';
 import { OnInit } from '@angular/core';
 import { NgZone } from '@angular/core';
+import * as rangy from 'rangy';
 
 // ----------------------------------------------------------------------------------- //
 // ----------------------------------------------------------------------------------- //
@@ -172,6 +173,7 @@ export class TextSelectDirective implements OnInit, OnDestroy {
     // emitted as a TextSelectEvent within the current element.
     private processSelection(): void {
 
+        const rangySelection = rangy.getSelection();
         const selection = document.getSelection();
 
         // If there is a new selection and an existing selection, let's clear out the
@@ -223,11 +225,22 @@ export class TextSelectDirective implements OnInit, OnDestroy {
             this.zone.runGuarded(
                 () => {
 
+                    // console.group('Selection Offset');
+                    // console.log('Extent: ' + selection.extentOffset);
+                    // console.log('Anchor: ' + selection.anchorOffset);
+                    // console.log('Focus: ' + selection.focusOffset);
+                    // console.log('Base: ' + selection.baseOffset);
+                    // console.log('Range Count: ' + selection.rangeCount);
+                    // console.log('Range: ' + selection.getRangeAt(0));
+                    // console.groupEnd();
+
+                    let bookmarks = rangySelection.getBookmark(this.elementRef.nativeElement.children[0]).rangeBookmarks[0];
+
                     this.hasSelection = true;
                     this.textSelectEvent.emit({
                         text: selection.toString(),
-                        start: selection.anchorOffset < selection.extentOffset ? selection.anchorOffset : selection.extentOffset,
-                        end: selection.anchorOffset < selection.extentOffset ? selection.extentOffset : selection.anchorOffset,
+                        start: bookmarks.start,
+                        end: bookmarks.end,
                         viewportRectangle: {
                             left: viewportRectangle.left,
                             top: viewportRectangle.top,
