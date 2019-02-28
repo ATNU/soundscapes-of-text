@@ -43,7 +43,7 @@ export class VoicesComponent implements OnInit, OnDestroy {
     this.languages.push(new PollyLanguage('en-GB', 'English'));
     this.languages.push(new PollyLanguage('en-US', 'American'));
 
-    this.getVoices(new PollyLanguage('en-GB', 'English British'));
+    this.getVoices();
   }
 
   ngOnDestroy() {
@@ -54,10 +54,18 @@ export class VoicesComponent implements OnInit, OnDestroy {
    * Retreieve all AWS Polly voices available for selected language
    * @param PollyLanguage language selected by user
    */
-  getVoices(language: PollyLanguage) {
+  getVoices() {
     this.pollyVoices = [];
-    this.pollyservice.getVoices(language).subscribe(voices =>
+
+    this.pollyservice.getVoices(new PollyLanguage('en-GB', 'English')).subscribe(voices =>
       voices.forEach(element => {
+        element.Icon = '/assets/en-GB.png';
+        this.pollyVoices.push(element);
+      }));
+
+    this.pollyservice.getVoices(new PollyLanguage('en-US', 'American')).subscribe(voices =>
+      voices.forEach(element => {
+        element.Icon = '/assets/en-US.png';
         this.pollyVoices.push(element);
       }));
   }
@@ -68,11 +76,11 @@ export class VoicesComponent implements OnInit, OnDestroy {
    * @param PollyVoice voice to query
    * @returns string boolean if selected
    */
-  isVoiceSelected(voice: PollyVoice): string {
+  isVoiceSelected(voice: PollyVoice): boolean {
     if (this.selectedVoice === voice.Id) {
-      return 'selectedTrue';
+      return true;
     }
-    return 'selectedFalse';
+    return false;
   }
 
   /**
