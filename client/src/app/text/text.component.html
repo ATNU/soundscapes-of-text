@@ -1,13 +1,14 @@
 <form [formGroup]="textFormGroup">
   <mat-form-field>
+      <mat-label>Example Texts</mat-label>
     <mat-select formControlName="textPreset" placeholder="Select Preset" [ngModel]="selectedTextPreset" (ngModelChange)="onChange($event)">
       <mat-option *ngFor="let text of textPresets" [value]="text">
         {{text.name}}
       </mat-option>
     </mat-select>
   </mat-form-field>
-  <mat-form-field dividerColor="primary" appearance="outline">
-    <mat-label>Insert your text here</mat-label>
+  <mat-form-field dividerColor="primary">
+    <mat-label>Insert Text </mat-label>
     <textarea formControlName="textInput" matInput matTextareaAutosize matAutosizeMinRows="20" #textInput (mouseup)="updateText(textInput)"
       (keyup)="updateText(textInput)" [(ngModel)]="displayText" placeholder="Text to encode">
           </textarea>
