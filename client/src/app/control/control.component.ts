@@ -5,6 +5,7 @@ import { PollyTag } from '@app/shared/polly/polly-tag';
 import { PollyService } from '@app/shared/polly/polly.service';
 import { PollySelection } from '@app/shared/polly/polly-selection';
 import { SafeHtml, DomSanitizer } from '@angular/platform-browser';
+import { MatDialog, MatDialogRef } from '@angular/material';
 
 interface SelectionRectangle {
   left: number;
@@ -56,7 +57,7 @@ export class ControlComponent implements OnInit, OnDestroy {
   encodingText: string;
   encodingTextSubscription: Subscription;
 
-  constructor(private pollyservice: PollyService, private sanitizer: DomSanitizer) {
+  constructor(private pollyservice: PollyService, private sanitizer: DomSanitizer, public dialog: MatDialog) {
     this.hostRectangle = null;
     this.selectedText = '';
     this.encodingTagSubscription = pollyservice.encodingTagUpdate$.subscribe(encodingTag => {
@@ -175,6 +176,7 @@ export class ControlComponent implements OnInit, OnDestroy {
       });
       if (!error) {
         this.selections.push(selection);
+        this.pollyservice.updateSelections(this.selections);
         this.lastSelection = selection;
         this.addTags();
       }
@@ -252,15 +254,15 @@ export class ControlComponent implements OnInit, OnDestroy {
     }
     if (name === 'prosody') {
       let pre = '<prosody';
-      if (this.prosodyConfig.volumeDefaultCheck === false) {
+      //if (this.prosodyConfig.volumeDefaultCheck === false) {
         pre = pre + ' volume="' + this.prosodyConfig.volumeValue + '"';
-      }
-      if (this.prosodyConfig.rateDefaultCheck === false) {
+      //}
+      //if (this.prosodyConfig.rateDefaultCheck === false) {
         pre = pre + ' rate="' + this.prosodyConfig.rateValue + '"';
-      }
-      if (this.prosodyConfig.pitchDefaultCheck === false) {
+      //}
+      //if (this.prosodyConfig.pitchDefaultCheck === false) {
         pre = pre + ' pitch="' + this.prosodyConfig.pitchValue + '"';
-      }
+      //}
       pre = pre + '>';
       const post = '</prosody>';
       this.encodingTag = new PollyTag(name, 'prosody', pre, post);
@@ -286,21 +288,53 @@ export class ControlComponent implements OnInit, OnDestroy {
    * Set the min and max value for break slider based upon which mode is selected (s/ms)
    * @param any event
    */
-  breakModeSwitch(event: any) {
-    if (event.value === 's') {
+  breakModeSwitch(mode: string) {
+    if (mode === 's') {
       this.breakConfig.breakSliderStep = 1;
       this.breakConfig.breakSliderMin = 0;
       this.breakConfig.breakSliderMax = 10;
-    } else if (event.value === 'ms') {
+      this.breakConfig.breakSliderMode = 's';
+    } else if (mode === 'ms') {
       this.breakConfig.breakSliderStep = 100;
       this.breakConfig.breakSliderMin = 10;
       this.breakConfig.breakSliderMax = 10000;
+      this.breakConfig.breakSliderMode = 'ms';
     }
   }
 
   changeEmphasis(value: string) {
     this.emphasisConfig.emphasisMode = value;
     this.onControlChange(null);
+  }
+
+  openDialog(): void {
+    const dialogRef = this.dialog.open(ClearTagsDialogComponent, {
+      width: '250px'
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      console.log('The dialog was closed');
+    });
+  }
+
+}
+
+@Component({
+  template: '<h1 mat-dialog-title>Hi {{data.name}}</h1>' +
+  '<div mat-dialog-content>' +
+    '<p>Are you sure you want to clear all tags?</p>' +
+  '</div>' +
+  '<div mat-dialog-actions>' +
+    '<button mat-button (click)="closeDialog()">Cancel</button>' +
+    '<button mat-button (click)="closeDialog()" cdkFocusInitial>Confirm</button>' +
+  '</div>',
+})
+export class ClearTagsDialogComponent {
+
+  constructor(public dialogRef: MatDialogRef<ClearTagsDialogComponent>) {}
+
+    closeDialog(): void {
+    this.dialogRef.close();
   }
 
 }

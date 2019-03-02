@@ -11,7 +11,7 @@
           <button [ngClass]="{'selected': currentTag === 'prosody'}" mat-button (click)="updateEncodingTag($event,'prosody')">
             <mat-icon>record_voice_over</mat-icon> Prosody
           </button>
-          <button [ngClass]="{'selected': currentTag === 'eraser'}" mat-button (click)="updateEncodingTag($event,'eraser')">
+          <button [ngClass]="{'selected': currentTag === 'eraser'}" mat-button (click)="openDialog()">
             <mat-icon>delete</mat-icon> Clear
           </button>
         </mat-toolbar>
@@ -30,13 +30,19 @@
                       -->
       <a *ngIf="currentTag === 'break'" (mousedown)="$event.preventDefault()" (mouseup)="$event.stopPropagation();" class="indicator__cta-link">
         <mat-radio-group [(ngModel)]="breakConfig.breakSliderMode">
-          <mat-radio-button value="s" (change)="breakModeSwitch($event)">Seconds</mat-radio-button>
-          <mat-radio-button value="ms" (change)="breakModeSwitch($event)">Milliseconds</mat-radio-button>
+          <mat-radio-button value="s" (mouseup)="breakModeSwitch('s')">Seconds</mat-radio-button>
+          <mat-radio-button value="ms" (mouseup)="breakModeSwitch('ms')">Milliseconds</mat-radio-button>
         </mat-radio-group>
-        <mat-slider [min]="breakConfig.breakSliderMin" [max]="breakConfig.breakSliderMax" [step]="breakConfig.breakSliderStep" [thumbLabel]="true" [(ngModel)]="breakConfig.breakValue" (change)="onControlChange($event)"></mat-slider>
-        <button class="TagButton" mat-button (mouseup)="cancel()">Cancel</button>
-        <button class="TagButton" mat-button (mouseup)="addTag()">Save</button>
-        <pre>{{breakConfig.breakValue}}</pre>
+        <h4>Break</h4>
+        <div class="slider-wrapper">
+          <span class="slider-min">{{breakConfig.breakSliderMin}}</span>
+          <mat-slider [min]="breakConfig.breakSliderMin" [max]="breakConfig.breakSliderMax" [step]="breakConfig.breakSliderStep" [thumbLabel]="true" [(ngModel)]="breakConfig.breakValue" (change)="onControlChange($event)"></mat-slider>
+          <span class="slider-min">{{breakConfig.breakSliderMax}}</span>
+        </div>
+        <div class="tag-buttons">
+            <button class="TagButton" mat-button (mouseup)="cancel()">Cancel</button>
+            <button class="TagButton" mat-button (mouseup)="addTag()">Save</button>
+        </div>
       </a>
       <a *ngIf="currentTag == 'emphasis'" (mousedown)="$event.preventDefault()" (mouseup)="$event.stopPropagation()" class="indicator__cta-link">
         <mat-radio-group [(ngModel)]="emphasisConfig.emphasisMode" (change)="onControlChange($event)">
@@ -44,19 +50,41 @@
           <mat-radio-button value="moderate" (mouseup)="changeEmphasis('moderate')">Moderate</mat-radio-button>
           <mat-radio-button value="reduced" (mouseup)="changeEmphasis('reduced')">Reduced</mat-radio-button>
         </mat-radio-group>
-        <button class="TagButton" mat-button (mouseup)="cancel()">Cancel</button>
-        <button class="TagButton" mat-button (mouseup)="addTag()">Save</button>
+        <div class="tag-buttons">
+            <button class="TagButton" mat-button (mouseup)="cancel()">Cancel</button>
+            <button class="TagButton" mat-button (mouseup)="addTag()">Save</button>
+        </div>
       </a>
       <a *ngIf="currentTag == 'prosody'" (mousedown)="$event.preventDefault()" (mouseup)="$event.stopPropagation()" class="indicator__cta-link">
-        <mat-slider min="-6" max="6" [disabled]="prosodyConfig.volumeDefaultCheck" step="1" thumbLabel="true" [(ngModel)]="prosodyConfig.volumeValue" (change)="onControlChange($event)"></mat-slider>
-        <mat-slider min="20" max="200" [disabled]="prosodyConfig.rateDefaultCheck" step="1" thumbLabel="true" [(ngModel)]="prosodyConfig.rateValue" (change)="onControlChange($event)"></mat-slider>
-        <mat-slider min="-100" max="100" [disabled]="prosodyConfig.pitchDefaultCheck" step="1" thumbLabel="true" [(ngModel)]="prosodyConfig.pitchValue" (change)="onControlChange($event)"></mat-slider>
-        <button class="TagButton" mat-button (mouseup)="cancel()">Cancel</button>
-        <button class="TagButton" mat-button (mouseup)="addTag()">Save</button>
+        <h4>Volume</h4>
+        <div class="slider-wrapper">
+          <span class="slider-min">-6</span>
+            <mat-slider fxFlex min="-6" max="6" step="1" thumbLabel="true" [(ngModel)]="prosodyConfig.volumeValue" (change)="onControlChange($event)"></mat-slider>
+            <span class="slider-max">6</span>
+        </div>
+        <h4>Rate</h4>
+        <div class="slider-wrapper">
+          <span class="slider-min">-20</span>
+          <mat-slider min="20" max="200" step="1" thumbLabel="true" [(ngModel)]="prosodyConfig.rateValue" (change)="onControlChange($event)"></mat-slider>
+            <span class="slider-max">200</span>
+        </div>
+        <h4>Pitch</h4>
+        <div class="slider-wrapper">
+          <span class="slider-min">-100</span>
+          <mat-slider min="-100" max="100" step="1" thumbLabel="true" [(ngModel)]="prosodyConfig.pitchValue" (change)="onControlChange($event)"></mat-slider>
+            <span class="slider-max">100</span>
+        </div>
+        <div class="tag-buttons">
+            <button class="TagButton" mat-button (mouseup)="cancel()">Cancel</button>
+            <button class="TagButton" mat-button (mouseup)="addTag()">Save</button>
+        </div>
+        
       </a>
       <a *ngIf="currentTag == 'eraser'" (mousedown)="$event.preventDefault()" (mouseup)="$event.stopPropagation()" class="indicator__cta-link">
-        <button class="TagButton" mat-button (mouseup)="cancel()">Cancel</button>
-        <button class="TagButton" mat-button (mouseup)="cancel()">Erase</button>
+          <div class="tag-buttons">
+              <button class="TagButton" mat-button (mouseup)="cancel()">Cancel</button>
+              <button class="TagButton" mat-button (mouseup)="cancel()">Save</button>
+          </div>
       </a>
     </div>
   </div>

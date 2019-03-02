@@ -9,6 +9,7 @@ import { PollyVoice } from '@app/shared/polly/polly-voice';
 import { PollyLanguage } from '@app/shared/polly/polly-language';
 import { PollyTag } from '@app/shared/polly/polly-tag';
 import { environment } from '@env/environment';
+import { PollySelection } from './polly-selection';
 
 @Injectable({
   providedIn: 'root'
@@ -22,12 +23,14 @@ export class PollyService implements OnInit {
   private encodingText = new Subject<string>();
   private encodingVoice = new Subject<string>();
   private encodingTag = new Subject<PollyTag>();
+  private encodingSelections = new Subject<PollySelection[]>();
 
   private encodingVoiceValue: string;
 
   encodingTextUpdate$ = this.encodingText.asObservable();
   encodingVoiceUpdate$ = this.encodingVoice.asObservable();
   encodingTagUpdate$ = this.encodingTag.asObservable();
+  encodingSelections$ = this.encodingSelections.asObservable();
 
   constructor(
     private http: HttpClient,
@@ -62,6 +65,14 @@ export class PollyService implements OnInit {
    */
   updateTag(encodingTag: PollyTag) {
     this.encodingTag.next(encodingTag);
+  }
+
+  /**
+   * Provide observable with newly received encoding tag
+   * @param PollyTag ssml tag to be painted
+   */
+  updateSelections(selections: PollySelection[]) {
+    this.encodingSelections.next(selections);
   }
 
   /**

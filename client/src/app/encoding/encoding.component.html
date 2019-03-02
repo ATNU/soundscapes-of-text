@@ -1,32 +1,21 @@
-<div fxLayout="column" class="wrapCard">
-  <div>
-    <mat-progress-bar class="progBar" [mode]="progressbarMode" [value]="progressbarValue">
-    </mat-progress-bar>
-  </div>
-  <div>
-    <button class="get_app" (click)="downloadEncoding()">
+<p>{{encodingText}}</p>
+<h4>Read By {{encodingVoice}}</h4>
+<!-- <div class="player">
+    <mat-spinner></mat-spinner>
+    <mat-icon (click)="createEncoding()">play</mat-icon>
+</div> -->
+
+  <mat-card>
+    <!-- <button class="get_app" (click)="downloadEncoding()">
       <i class="material-icons">get_app</i>
     </button>
     <button class="update" (click)="updatePlayerSource()">
       <i class="material-icons">update</i>
-    </button>
-
-    <vg-player class="videogular-container audio" (onPlayerReady)="onPlayerReady($event)">
-      <vg-controls>
-        <vg-play-pause class="encoding-control"></vg-play-pause>
-        <vg-time-display vgProperty="current" vgFormat="mm:ss" class="encoding-control"></vg-time-display>
-
-        <vg-scrub-bar>
-          <vg-scrub-bar-current-time class="encoding-scrub scrubBar"></vg-scrub-bar-current-time>
-          <vg-scrub-bar-buffering-time class="encoding-scrub scrubBar"></vg-scrub-bar-buffering-time>
-        </vg-scrub-bar>
-
-        <vg-time-display vgProperty="total" vgFormat="mm:ss" class="encoding-control"></vg-time-display>
-        <vg-volume class="encoding-control"></vg-volume>
-      </vg-controls>
+    </button> -->
+    <h4 *ngIf="generatingEncoding">Loading...</h4>
+    <vg-player *ngIf="!generatingEncoding" class="videogular-container audio" (onPlayerReady)="onPlayerReady($event)">
       <audio #myMedia [vgMedia]="myMedia" [vgMaster]="true" media id="singleVideo" preload="auto" controls>
         <source *ngFor="let audio of sources" [src]="audio.src" type="audio/mpeg">
       </audio>
     </vg-player>
-  </div>
-</div>
+  </mat-card>

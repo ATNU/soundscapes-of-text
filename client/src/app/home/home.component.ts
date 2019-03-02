@@ -4,6 +4,7 @@ import { finalize } from 'rxjs/operators';
 import { PollyService } from '@app/shared/polly/polly.service';
 import { TextComponent } from '@app/text/text.component';
 import { VoicesComponent } from '@app/voices/voices.component';
+import { EncodingComponent } from '@app/encoding/encoding.component';
 
 @Component({
   selector: 'app-home',
@@ -15,6 +16,7 @@ export class HomeComponent implements OnInit {
 
   @ViewChild(TextComponent) textComponent: TextComponent;
   @ViewChild(VoicesComponent) voicesComponent: VoicesComponent;
+  @ViewChild(EncodingComponent) encodingComponent: EncodingComponent;
 
   get frmStepOne() {
       return this.textComponent ? this.textComponent.textFormGroup : null;
@@ -28,4 +30,11 @@ export class HomeComponent implements OnInit {
 
   ngOnInit() { }
 
+  public onStepChange(event: any): void {
+    if (event.selectedIndex === 3) {
+      console.log('Fetch Encoding');
+
+      this.encodingComponent.updatePlayerSource();
+    }
+  }
 }

@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { VgAPI } from 'videogular2/core';
 import { PollyService } from '@app/shared/polly/polly.service';
 import { Subscription } from '../../../node_modules/rxjs';
+import { PollySelection } from '@app/shared/polly/polly-selection';
 
 @Component({
   selector: 'app-encoding',
@@ -15,12 +16,15 @@ export class EncodingComponent implements OnInit, OnDestroy {
 
   encodingTextSubscription: Subscription;
   encodingVoiceSubscription: Subscription;
+  encodingSelectionsSubscription: Subscription;
 
   encodingText: string;
   encodingVoice: string;
+  encodingSelections: PollySelection[];
 
   progressbarMode: string;
   progressbarValue: number;
+  generatingEncoding: boolean;
 
   constructor(private pollyservice: PollyService) {
     this.encodingTextSubscription = pollyservice.encodingTextUpdate$.subscribe(encodingText => {
@@ -28,6 +32,9 @@ export class EncodingComponent implements OnInit, OnDestroy {
     });
     this.encodingVoiceSubscription = pollyservice.encodingVoiceUpdate$.subscribe(encodingVoice => {
       this.encodingVoice = encodingVoice;
+    });
+    this.encodingSelectionsSubscription = pollyservice.encodingSelections$.subscribe(encodingSelections => {
+      this.encodingSelections = encodingSelections;
     });
    }
 
@@ -39,11 +46,17 @@ export class EncodingComponent implements OnInit, OnDestroy {
     });
     this.progressbarMode = 'determinate';
     this.progressbarValue = 100;
+    this.generatingEncoding = true;
   }
 
   ngOnDestroy() {
     this.encodingTextSubscription.unsubscribe();
     this.encodingVoiceSubscription.unsubscribe();
+    this.encodingSelectionsSubscription.unsubscribe();
+  }
+
+  createEncoding() {
+    console.log(this.encodingSelections);
   }
 
   /**
@@ -66,8 +79,37 @@ export class EncodingComponent implements OnInit, OnDestroy {
    */
   updatePlayerSource() {
     this.progressbarMode = 'indeterminate';
+    this.generatingEncoding = true;
 
-    this.pollyservice.getEncoding(this.encodingText).subscribe(url => {
+    this.encodingSelections.sort((ls, rs): number => {
+      if (ls.caretStart > rs.caretStart) {
+        return 1;
+      }
+      if (ls.caretStart < rs.caretStart) {
+        return -1;
+      }
+      return 0;
+    });
+
+    let text = String(this.encodingText).replace(/<[^>]+>/gm, '');
+    text = '<speak>' + text + '</speak>';
+    let offset = 7;
+
+    this.encodingSelections.forEach(selection => {
+
+      text = [
+        text.slice(0, (selection.caretStart + offset)),
+        selection.ssml,
+        text.slice(selection.caretEnd + offset)]
+        .join('');
+      offset = offset + selection.litter;
+    });
+
+    // clean up invalid break tags
+    text = text.replace(new RegExp('</break>', 'g'), '');
+
+
+    this.pollyservice.getEncoding(text).subscribe(url => {
       console.log('URL', url);
       this.api.pause();
       this.sources = [];
@@ -78,6 +120,7 @@ export class EncodingComponent implements OnInit, OnDestroy {
       this.api.currentTime = 0;
       this.progressbarMode = 'determinate';
       this.progressbarValue = 100;
+      this.generatingEncoding = false;
     });
   }
 
