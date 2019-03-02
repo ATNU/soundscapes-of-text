@@ -64,9 +64,7 @@ export class ControlComponent implements OnInit, OnDestroy {
     });
     this.encodingTextSubscription = pollyservice.encodingTextUpdate$.subscribe(encodingText => {
       this.encodingText = encodingText;
-      if (this.paintText === '') {
-        this.addTags();
-      }
+      this.addTags();
     });
   }
 
@@ -99,6 +97,7 @@ export class ControlComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.encodingTextSubscription.unsubscribe();
     this.encodingTagSubscription.unsubscribe();
   }
 
@@ -223,9 +222,6 @@ export class ControlComponent implements OnInit, OnDestroy {
     });
 
     this.paintText = this.sanitizer.bypassSecurityTrustHtml(text);
-
-    this.pollyservice.updateText(text);
-    localStorage.setItem('encodingText', this.encodingText);
 
     return this.encodingText;
   }

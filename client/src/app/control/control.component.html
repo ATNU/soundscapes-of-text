@@ -1,19 +1,22 @@
-<mat-toolbar>
-  <button [ngClass]="{'selected': currentTag === 'break'}" mat-button (click)="updateEncodingTag($event,'break')">
-    <mat-icon>pause</mat-icon> Break
-  </button>
-  <button [ngClass]="{'selected': currentTag === 'emphasis'}" mat-button (click)="updateEncodingTag($event,'emphasis')">
-    <mat-icon>volume_up</mat-icon> Emphasis
-  </button>
-  <button [ngClass]="{'selected': currentTag === 'prosody'}" mat-button (click)="updateEncodingTag($event,'prosody')">
-    <mat-icon>record_voice_over</mat-icon> Prosody
-  </button>
-  <button [ngClass]="{'selected': currentTag === 'eraser'}" mat-button (click)="updateEncodingTag($event,'eraser')">
-    <mat-icon>delete</mat-icon> Clear
-  </button>
-</mat-toolbar>
 
-<mat-card (textSelect)="renderRectangles( $event )" class="container" [ngClass]="currentTag">
+<mat-card class=control-panel>
+  <mat-card-header>
+      <mat-toolbar>
+          <button [ngClass]="{'selected': currentTag === 'break'}" mat-button (click)="updateEncodingTag($event,'break')">
+            <mat-icon>pause</mat-icon> Break
+          </button>
+          <button [ngClass]="{'selected': currentTag === 'emphasis'}" mat-button (click)="updateEncodingTag($event,'emphasis')">
+            <mat-icon>volume_up</mat-icon> Emphasis
+          </button>
+          <button [ngClass]="{'selected': currentTag === 'prosody'}" mat-button (click)="updateEncodingTag($event,'prosody')">
+            <mat-icon>record_voice_over</mat-icon> Prosody
+          </button>
+          <button [ngClass]="{'selected': currentTag === 'eraser'}" mat-button (click)="updateEncodingTag($event,'eraser')">
+            <mat-icon>delete</mat-icon> Clear
+          </button>
+        </mat-toolbar>
+  </mat-card-header>
+<mat-card-content (textSelect)="renderRectangles( $event )" class="container" [ngClass]="currentTag">
   <p [innerHtml]="paintText"></p>
   <div *ngIf="hostRectangle" class="indicator" [style.left.px]="hostRectangle.left" [style.top.px]="hostRectangle.top" [style.width.px]="hostRectangle.width" [style.height.px]="0">
     <div class="indicator__cta">
@@ -57,6 +60,7 @@
       </a>
     </div>
   </div>
+</mat-card-content>
 </mat-card>
 <!--<mat-button-toggle-group name="tagSelect" aria-label="Tag Select">
   <mat-card class="example-card">

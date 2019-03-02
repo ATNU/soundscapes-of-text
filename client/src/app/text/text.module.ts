@@ -12,7 +12,9 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
     FormsModule,
     ReactiveFormsModule
   ],
-  declarations: [TextComponent],
+  declarations: [
+    TextComponent
+  ],
   exports: [
     TextComponent
   ]

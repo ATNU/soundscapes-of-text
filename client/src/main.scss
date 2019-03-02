@@ -25,3 +25,36 @@
 
 // Theme customization
 @import "theme/theme";
+
+mat-card.control-panel {
+
+	mat-card-header {
+		margin: -24px -24px 0px !important;
+
+		.mat-card-header-text {
+			display: none;
+			margin: 0;
+		}
+	}
+
+	mat-card-content {
+		padding: 24px;
+
+		p {
+			font-size: 1.6em;
+			line-height: 1.8em;
+
+			break {
+				background-color: #e07575;
+			}
+
+			emphasis {
+				background-color: #9175e0;
+			}
+
+			prosody {
+				background-color: #c9e075;
+			}
+		}
+	}
+}

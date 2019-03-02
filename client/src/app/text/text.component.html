@@ -9,11 +9,9 @@
   </mat-form-field>
   <mat-form-field dividerColor="primary">
     <mat-label>Insert Text </mat-label>
-    <textarea formControlName="textInput" matInput matTextareaAutosize matAutosizeMinRows="20" #textInput (mouseup)="updateText(textInput)"
-      (keyup)="updateText(textInput)" [(ngModel)]="displayText" placeholder="Text to encode">
-          </textarea>
+    <textarea formControlName="textInput" matInput matTextareaAutosize matAutosizeMinRows="20" #textInput (keyup)="updateText(textInput)" [(ngModel)]="encodingText" placeholder="Text to encode"></textarea>
   </mat-form-field>
-  <div>
+  <!-- <div>
     <button mat-button color="primary" matStepperNext>Next</button>
-  </div>
+  </div> -->
 </form>

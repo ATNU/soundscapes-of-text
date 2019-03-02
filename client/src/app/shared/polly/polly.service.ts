@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, OnInit } from '@angular/core';
 import { Observable, of, Subject } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
@@ -13,7 +13,7 @@ import { environment } from '@env/environment';
 @Injectable({
   providedIn: 'root'
 })
-export class PollyService {
+export class PollyService implements OnInit {
 
   private voicesUrl = '/voices';
   private demoUrl = '/demo';
@@ -34,12 +34,16 @@ export class PollyService {
     public snackBar: MatSnackBar
   ) {}
 
+  ngOnInit() {
+    this.encodingText.next(localStorage.getItem('encodingText'));
+  }
 
   /**
    * Provide observable with newly received encoding text
    * @param string text to encode
    */
   updateText(encodingText: string) {
+    localStorage.setItem('encodingText', encodingText);
     this.encodingText.next(encodingText);
   }
 

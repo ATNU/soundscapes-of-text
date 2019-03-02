@@ -22,46 +22,42 @@
     background-color: #c9e075;
 }
 
-.prosody {
-    height: 260px;
-}
+/* mat-card.control-panel {
 
-.prosodyCard {
-    width: 30%;
-    float: left;
-}
+	mat-card-header {
+		margin: -24px -24px 0px;
 
-.mat-card.example-card {
-    width: calc(100% - 50px);
-    margin: 25px auto;
-    padding-bottom: 20px;
-  
-    &.fxClass-xs,
-    &.fxClass-sm {
-      width: calc(100% - 20px);
-      margin: 10px auto;
-    }
-  
-    app-calendar {
-      display: block;
-      width: 100%;
-      height: 100%;
-    }
-  }
+		.mat-card-header-text {
+			display: none;
+			margin: 0;
+		}
+	}
 
-button {
-    border: none;
-    background: transparent;
-}
+	mat-card-content {
+		padding: 24px;
 
-button.play {
-    position: relative;
-    float: right;
-}
+		p {
+			font-size: 1.6em;
+			line-height: 1.8em;
 
-button :hover {
-    color: rgb(95, 24, 153);
-}
+			speak {
+				background-color: #e07575;
+			}
+
+			break {
+				background-color: #e07575;
+			}
+
+			emphasis {
+				background-color: #9175e0;
+			}
+
+			prosody {
+				background-color: #c9e075;
+			}
+		}
+	}
+} */
 
 mat-card.container {
 	position: relative;
@@ -91,7 +87,7 @@ mat-card.container {
 
 	&.eraser {
 		.indicator__cta-link:after {
-			color: #white;
+			color: white;
 		}
 	}
 }
