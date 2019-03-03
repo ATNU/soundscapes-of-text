@@ -68,7 +68,6 @@ export class EncodingComponent implements OnInit, OnDestroy {
    * @param encoding source of media
    */
   updatePlayerSource() {
-    this.progressbarMode = 'indeterminate';
     this.generatingEncoding = true;
 
     this.encodingSelections.sort((ls, rs): number => {
