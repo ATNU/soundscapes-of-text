@@ -236,12 +236,6 @@ export class ControlComponent implements OnInit, OnDestroy {
   updateEncodingTag(event: any, name: string) {
     this.currentTag = name;
 
-    console.group('Config');
-    console.log(this.breakConfig);
-    console.log(this.emphasisConfig);
-    console.log(this.prosodyConfig);
-    console.groupEnd();
-
     if (name === 'break') {
       const pre = '<break time="' + this.breakConfig.breakValue + this.breakConfig.breakSliderMode + '">';
       const post = '</break>';
@@ -320,7 +314,7 @@ export class ControlComponent implements OnInit, OnDestroy {
 }
 
 @Component({
-  template: '<h1 mat-dialog-title>Hi {{data.name}}</h1>' +
+  template: '<h1 mat-dialog-title>Clear Tags</h1>' +
   '<div mat-dialog-content>' +
     '<p>Are you sure you want to clear all tags?</p>' +
   '</div>' +

@@ -32,8 +32,6 @@ export class HomeComponent implements OnInit {
 
   public onStepChange(event: any): void {
     if (event.selectedIndex === 3) {
-      console.log('Fetch Encoding');
-
       this.encodingComponent.updatePlayerSource();
     }
   }

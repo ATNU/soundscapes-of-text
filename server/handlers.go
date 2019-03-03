@@ -116,11 +116,18 @@ func HandleGenerateS3(w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 		return
 	}
+	w.Header().Set("Content-Type", "application/x-www-form-urlencoded")
+	w.Header().Set("Access-Control-Allow-Origin", viper.GetString("webserver.clientAddr"))
+	w.Write([]byte(f))
+	return
 
-	var timeout int
+	/* var timeout int
 	for resp, err := http.Head(f); err == nil; {
+
+
+
 		for resp.StatusCode != 200 && timeout < viper.GetInt("s3.maxRetryCount") {
-			log.Println("in I go")
+			log.Println("Waiting for S3 to reply")
 			time.Sleep(2 * time.Second)
 			resp, err = http.Head(f)
 			timeout = +1
@@ -131,7 +138,7 @@ func HandleGenerateS3(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.WriteHeader(http.StatusInternalServerError)
-	log.Println(err)
+	log.Println(err) */
 }
 
 // HandleGenerateFile returns a text-to-speech encoding of the provided

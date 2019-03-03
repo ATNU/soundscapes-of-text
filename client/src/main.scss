@@ -26,6 +26,10 @@
 // Theme customization
 @import "theme/theme";
 
+[hidden]{
+	display:none!important
+}
+
 mat-card.control-panel {
 
 	mat-card-header {

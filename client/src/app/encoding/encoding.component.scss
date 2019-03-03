@@ -5,3 +5,16 @@ vg-player {
 		width: 100%;
 	}
 }
+
+.loading-message {
+	display: flex;
+	flex-direction: row;
+
+	mat-spinner {
+		flex: 24px;
+	}
+
+	h4 {
+		flex-grow: 1;
+	}
+}

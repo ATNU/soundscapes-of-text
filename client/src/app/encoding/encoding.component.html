@@ -1,21 +1,13 @@
 <p>{{encodingText}}</p>
 <h4>Read By {{encodingVoice}}</h4>
-<!-- <div class="player">
-    <mat-spinner></mat-spinner>
-    <mat-icon (click)="createEncoding()">play</mat-icon>
-</div> -->
-
-  <mat-card>
-    <!-- <button class="get_app" (click)="downloadEncoding()">
-      <i class="material-icons">get_app</i>
-    </button>
-    <button class="update" (click)="updatePlayerSource()">
-      <i class="material-icons">update</i>
-    </button> -->
-    <h4 *ngIf="generatingEncoding">Loading...</h4>
-    <vg-player *ngIf="!generatingEncoding" class="videogular-container audio" (onPlayerReady)="onPlayerReady($event)">
-      <audio #myMedia [vgMedia]="myMedia" [vgMaster]="true" media id="singleVideo" preload="auto" controls>
-        <source *ngFor="let audio of sources" [src]="audio.src" type="audio/mpeg">
-      </audio>
-    </vg-player>
-  </mat-card>
+<mat-card>
+  <div class="loading-message">
+      <mat-spinner diameter="24"></mat-spinner>
+      <h4 *ngIf="generatingEncoding">Generating encoding...</h4>
+  </div>
+  <vg-player [hidden]="generatingEncoding" class="videogular-container audio" (onPlayerReady)="onPlayerReady($event)">
+    <audio #myMedia [vgMedia]="myMedia" [vgMaster]="true" media id="singleVideo" preload="auto" controls>
+      <source *ngFor="let audio of sources" [src]="audio.src" type="audio/mpeg">
+    </audio>
+  </vg-player>
+</mat-card>
