@@ -1,0 +1,12 @@
+<div class="voices" fxFlexFill fxLayoutGap="10px grid">
+  <mat-card class="voice" *ngFor="let voice of pollyVoices" (click)="updateVoice(voice)">
+    <mat-card-content class="content">
+      <div *ngIf="isVoiceSelected(voice)" class="voice-selected">
+        <span><i class="material-icons">done</i></span>
+      </div>
+      <span class="play-button"><i class="material-icons" (click)="play(voice)">play_circle_outline</i></span>
+      <h4>{{voice.Id}}</h4>
+      <img [src]="voice.Icon" alt="US Flag" width="50%">
+    </mat-card-content>
+  </mat-card>
+</div>

@@ -1,0 +1,66 @@
+.voices {
+    display: flex;
+    flex-wrap: wrap;
+
+    .voice {
+        width: 100%;
+        margin-top: 2%;
+        text-align: center;
+        overflow: hidden;
+        position: relative;
+        cursor: pointer;
+        
+        @media (min-width: 48rem) {
+            width: 23.5%;
+            &:nth-child(4n) {
+                margin-right: 2%;
+            }
+        }
+        
+        @media (min-width: 62rem) {
+            width: 15%;
+            &:not(:nth-child(6n)) {
+                margin-right: 2%;
+            }
+        }
+
+        mat-card-content {
+
+            .voice-selected {
+                background-color: #2196f3;
+                height: 100px;
+                left: -50px;
+                position: absolute;
+                top: -50px;
+                width: 100px;
+                -webkit-transform: rotate(-45deg);
+
+                span {
+                    color: #f5f5f5;
+                    font-family: sans-serif;
+                    font-size: 1.005em;
+                    left: 10px;
+                    top: 70px;
+                    font-weight: bold;
+                    position: absolute;
+                    width: 80px;
+                    -webkit-transform: rotate(45deg);
+                  }
+            }
+        }
+        
+        &:before {
+        content: "";
+        float: left;
+        padding-top: 100%;
+        }
+
+        .play-button {
+            cursor: pointer;
+
+            i {
+                font-size: 32px;
+            }
+        }
+    }
+}

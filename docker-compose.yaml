@@ -19,7 +19,7 @@ services:
       context: ./
       dockerfile: server/Dockerfile
     ports:
-      - "4200:8080"
+      - "4300:8080"
     networks:
       - soundscapes
 

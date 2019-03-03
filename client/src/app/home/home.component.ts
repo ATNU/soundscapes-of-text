@@ -1,7 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { finalize } from 'rxjs/operators';
 
 import { PollyService } from '@app/shared/polly/polly.service';
+import { TextComponent } from '@app/text/text.component';
+import { VoicesComponent } from '@app/voices/voices.component';
+import { EncodingComponent } from '@app/encoding/encoding.component';
 
 @Component({
   selector: 'app-home',
@@ -11,13 +14,25 @@ import { PollyService } from '@app/shared/polly/polly.service';
 })
 export class HomeComponent implements OnInit {
 
-  quote: string;
-  isLoading: boolean;
+  @ViewChild(TextComponent) textComponent: TextComponent;
+  @ViewChild(VoicesComponent) voicesComponent: VoicesComponent;
+  @ViewChild(EncodingComponent) encodingComponent: EncodingComponent;
+
+  get frmStepOne() {
+      return this.textComponent ? this.textComponent.textFormGroup : null;
+  }
+
+  get frmStepThree() {
+    return this.voicesComponent ? this.voicesComponent.voicesFormGroup : null;
+}
 
   constructor(private pollyService: PollyService) { }
 
-  ngOnInit() {
-    this.isLoading = true;
-  }
+  ngOnInit() { }
 
+  public onStepChange(event: any): void {
+    if (event.selectedIndex === 3) {
+      this.encodingComponent.updatePlayerSource();
+    }
+  }
 }

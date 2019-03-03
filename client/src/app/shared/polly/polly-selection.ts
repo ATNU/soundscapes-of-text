@@ -1,3 +1,5 @@
+import { PollyTag } from "./polly-tag";
+
 export class PollySelection {
 
     private _caretStart: number;
@@ -7,6 +9,7 @@ export class PollySelection {
     private _css: string;
     private _litter: number;
     private _csslitter: number;
+    private _tag: PollyTag;
 
     constructor(caretStart: number, caretEnd: number, range: string) {
         this._caretStart = caretStart;
@@ -57,6 +60,14 @@ export class PollySelection {
 
     public get range(): string {
         return this._range;
+    }
+
+    public get tag(): PollyTag {
+        return this._tag;
+    }
+
+    public set tag(tag: PollyTag) {
+        this._tag = tag;
     }
 
     public get ssml(): string {

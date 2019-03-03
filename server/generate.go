@@ -110,6 +110,7 @@ func GenerateToS3(body, id string, svc pollyiface.PollyAPI) (string, error) {
 
 	o, err := svc.StartSpeechSynthesisTask(task)
 	if err != nil {
+		log.Println(err)
 		return "", err
 	}
 	return *o.SynthesisTask.OutputUri, nil

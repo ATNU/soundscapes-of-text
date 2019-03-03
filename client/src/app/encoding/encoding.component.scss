@@ -1,86 +1,20 @@
-mat-progress-bar{
-	width: 100%;
-	display: flex;
-}
-
-.wrapCard {
-	width: 100%;
-}
-
-.material-icons {
-    font-size: 70px;
-    color: white;
-    background-color: rgb(72, 145, 220);
-}
-
-.update{
-	background-color: rgb(72, 145, 220);
-	border-color: rgb(72, 145, 220);
-	float: left;
-}
-
-.get_app{
-	background-color: rgb(72, 145, 220);
-	border-color: rgb(72, 145, 220);
-	float: left;
-}
-
-
-vg-scrub-bar .scrubBar{
-	top: 10px;
-	position: absolute;
-	height: 31px;
-}
 vg-player {
-	height: 100%;
+	background: transparent;
+
+	audio {
+		width: 100%;
+	}
 }
 
-vg-play-pause {
-    color: white;
-}
-
-vg-controls {
-	background-color: rgb(72, 145, 220);
-	height: 100%;
-	padding-top: 10px;
-	padding-left: 20px;
-	padding-right: 20px;
-	float: left;
+.loading-message {
+	display: flex;
 	flex-direction: row;
-}
- 
-@media (min-width: 1200px) {
-	.videogular-container {
-		width: 1170px;
-		height: 658.125px;
+
+	mat-spinner {
+		flex: 24px;
 	}
 
-	.videogular-container.audio {
-		width: 1170px;
-		height: 50px;
-	}
-}
-
-@media (min-width: 992px) and (max-width: 1199px) {
-	.videogular-container {
-		width: 940px;
-		height: 528.75px;
-	}
-
-	.videogular-container.audio {
-		width: 940px;
-		height: 50px;
-	}
-}
-
-@media (min-width: 768px) and (max-width: 991px) {
-	.videogular-container {
-		width: 728px;
-		height: 409.5px;
-	}
-
-	.videogular-container.audio {
-		width: 728px;
-		height: 50px;
+	h4 {
+		flex-grow: 1;
 	}
 }

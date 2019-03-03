@@ -1,10 +1,18 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
+import { TextSelectEvent } from './text-select.directive';
 import { Subscription } from '../../../node_modules/rxjs';
-import { PollyVoice } from '@app/shared/polly/polly-voice';
-import { PollyLanguage } from '@app/shared/polly/polly-language';
 import { PollyTag } from '@app/shared/polly/polly-tag';
 import { PollyService } from '@app/shared/polly/polly.service';
+import { PollySelection } from '@app/shared/polly/polly-selection';
+import { SafeHtml, DomSanitizer } from '@angular/platform-browser';
+import { MatDialog, MatDialogRef } from '@angular/material';
 
+interface SelectionRectangle {
+  left: number;
+  top: number;
+  width: number;
+  height: number;
+}
 
 @Component({
   selector: 'app-control',
@@ -13,72 +21,211 @@ import { PollyService } from '@app/shared/polly/polly.service';
 })
 export class ControlComponent implements OnInit, OnDestroy {
 
-  selectedVoice: string;
+  public hostRectangle: SelectionRectangle | null;
+  private selectedText: string;
+  private selectionBounds: [number, number];
 
+  paintText: SafeHtml = '';
+  currentTag: string;
 
-  breakSliderMode: string;
-  breakSliderStep: number;
-  breakSliderMin: number;
-  breakSliderMax: number;
-  breakValue: number;
+  breakConfig: {
+    breakSliderMode: string;
+    breakSliderStep: number;
+    breakSliderMin: number;
+    breakSliderMax: number;
+    breakValue: number;
+  };
 
-  emphasisMode: string;
+  emphasisConfig: {
+    emphasisMode: string;
+  };
 
-  volumeDefaultCheck: boolean;
-  rateDefaultCheck: boolean;
-  pitchDefaultCheck: boolean;
-  volumeValue: number;
-  rateValue: number;
-  pitchValue: number;
+  prosodyConfig: {
+    volumeDefaultCheck: boolean;
+    rateDefaultCheck: boolean;
+    pitchDefaultCheck: boolean;
+    volumeValue: number;
+    rateValue: number;
+    pitchValue: number;
+  };
 
-  selectedLanguage: PollyLanguage;
-  languages: PollyLanguage[] = Array<PollyLanguage>();
+  lastSelection: PollySelection;
+  selections = Array<PollySelection>();
 
-  pollyVoices: PollyVoice[] = Array<PollyVoice>();
-
-  encodingVoice: string;
-  encodingVoiceSubscription: Subscription;
   encodingTag: PollyTag;
   encodingTagSubscription: Subscription;
+  encodingText: string;
+  encodingTextSubscription: Subscription;
 
-  constructor(private pollyservice: PollyService) {
-    this.encodingVoiceSubscription = pollyservice.encodingVoiceUpdate$.subscribe(encodingVoice => {
-      this.encodingVoice = encodingVoice;
-    });
+  constructor(private pollyservice: PollyService, private sanitizer: DomSanitizer, public dialog: MatDialog) {
+    this.hostRectangle = null;
+    this.selectedText = '';
     this.encodingTagSubscription = pollyservice.encodingTagUpdate$.subscribe(encodingTag => {
       this.encodingTag = encodingTag;
+    });
+    this.encodingTextSubscription = pollyservice.encodingTextUpdate$.subscribe(encodingText => {
+      this.encodingText = encodingText;
+      this.addTags();
     });
   }
 
   ngOnInit() {
-    this.selectedVoice = 'Emma';
-    this.pollyservice.updateVoice('Emma');
 
-    this.breakSliderMode = 's';
-    this.breakSliderStep = 1;
-    this.breakSliderMin = 0;
-    this.breakSliderMax = 10;
-    this.breakValue = 0;
+    this.currentTag = null;
 
-    this.emphasisMode = 'moderate';
+    this.breakConfig = {
+      breakSliderMode: 's',
+      breakSliderStep: 1,
+      breakSliderMin: 0,
+      breakSliderMax: 10,
+      breakValue: 1
+    };
 
-    this.volumeDefaultCheck = true;
-    this.rateDefaultCheck = true;
-    this.pitchDefaultCheck = true;
-    this.volumeValue = 0;
-    this.rateValue = 100;
-    this.pitchValue = 0;
+    this.emphasisConfig = {
+      emphasisMode: 'moderate'
+    };
 
-    this.languages.push(new PollyLanguage('en-GB', 'English'));
-    this.languages.push(new PollyLanguage('en-US', 'American'));
+    this.prosodyConfig = {
+      volumeDefaultCheck: true,
+      rateDefaultCheck: true,
+      pitchDefaultCheck:  true,
+      volumeValue: 0,
+      rateValue: 100,
+      pitchValue:  0
+    };
 
-    this.getVoices(new PollyLanguage('en-GB', 'English British'));
     this.encodingTag = new PollyTag('', '', '', '');
   }
 
   ngOnDestroy() {
-    this.encodingVoiceSubscription.unsubscribe();
+    this.encodingTextSubscription.unsubscribe();
     this.encodingTagSubscription.unsubscribe();
+  }
+
+  onControlChange(event: any) {
+    this.updateEncodingTag(null, this.currentTag);
+  }
+
+  // ---
+  // PUBLIC METHODS.
+  // ---
+
+  // I render the rectangles emitted by the [textSelect] directive.
+  public renderRectangles(event: TextSelectEvent): void {
+
+    // If a new selection has been created, the viewport and host rectangles will
+    // exist. Or, if a selection is being removed, the rectangles will be null.
+    if (event.hostRectangle) {
+
+      this.hostRectangle = event.hostRectangle;
+      this.selectedText = event.text;
+      this.selectionBounds = [event.start, event.end];
+
+    } else {
+
+      this.hostRectangle = null;
+      this.selectedText = '';
+
+    }
+
+  }
+
+  public cancel(): void {
+
+    // Now that we've shared the text, let's clear the current selection.
+    document.getSelection().removeAllRanges();
+    // CAUTION: In modern browsers, the above call triggers a 'selectionchange'
+    // event, which implicitly calls our renderRectangles() callback. However,
+    // in IE, the above call doesn't appear to trigger the 'selectionchange'
+    // event. As such, we need to remove the host rectangle explicitly.
+    this.hostRectangle = null;
+    this.selectedText = '';
+    this.selectionBounds = [null, null];
+
+  }
+
+  /**
+   * Create a new local record of the user selected tag
+   * Ensure that this tag does not overlap or override any prexisting tags
+   */
+  addTag() {
+    if (this.selectionBounds && this.selectedText) {
+
+      let selection: PollySelection;
+
+      const start = this.selectionBounds[0],
+          end = this.selectionBounds[1],
+          range = (end - start).toString();
+
+      selection = new PollySelection(start, end, range);
+      selection.tag = this.encodingTag;
+      selection.ssml = this.encodingTag.wrap(this.selectedText);
+      selection.css = this.encodingTag.paint(this.selectedText);
+      selection.litter = this.encodingTag.litter();
+      selection.csslitter = this.encodingTag.csslitter();
+
+      let error = false;
+      this.selections.forEach(idx => {
+        if (selection.overrides(idx) || selection.overlaps(idx)) {
+          console.log('Error');
+          console.log(idx);
+          error = true;
+          this.lastSelection = selection;
+          return;
+        }
+      });
+      if (!error) {
+        this.selections.push(selection);
+        this.pollyservice.updateSelections(this.selections);
+        this.lastSelection = selection;
+        this.addTags();
+      }
+
+      // Now that we've shared the text, let's clear the current selection.
+      document.getSelection().removeAllRanges();
+      // CAUTION: In modern browsers, the above call triggers a 'selectionchange'
+      // event, which implicitly calls our renderRectangles() callback. However,
+      // in IE, the above call doesn't appear to trigger the 'selectionchange'
+      // event. As such, we need to remove the host rectangle explicitly.
+      this.hostRectangle = null;
+      this.selectedText = '';
+      this.selectionBounds = [null, null];
+    }
+  }
+
+  /**
+   * Add ssml tags to input text in preparation for sending
+   * to AWS Polly
+   * @returns string input text with ssml tags included
+   */
+  addTags(): string {
+    this.selections.sort((ls, rs): number => {
+      if (ls.caretStart > rs.caretStart) {
+        return 1;
+      }
+      if (ls.caretStart < rs.caretStart) {
+        return -1;
+      }
+      return 0;
+    });
+
+    let text = String(this.encodingText).replace(/<[^>]+>/gm, '');
+    text = '<speak>' + text + '</speak>';
+    let offset = 7;
+
+    this.selections.forEach(selection => {
+
+      text = [
+        text.slice(0, (selection.caretStart + offset)),
+        selection.ssml,
+        text.slice(selection.caretEnd + offset)]
+        .join('');
+      offset = offset + selection.litter;
+    });
+
+    this.paintText = this.sanitizer.bypassSecurityTrustHtml(text);
+
+    return this.encodingText;
   }
 
   /**
@@ -87,56 +234,35 @@ export class ControlComponent implements OnInit, OnDestroy {
    * @param string name of ssml tag
    */
   updateEncodingTag(event: any, name: string) {
+    this.currentTag = name;
+
     if (name === 'break') {
-      const pre = '<break time="' + this.breakValue + this.breakSliderMode + '"/>';
-      this.encodingTag = new PollyTag(name, 'e07575', pre, '');
+      const pre = '<break time="' + this.breakConfig.breakValue + this.breakConfig.breakSliderMode + '">';
+      const post = '</break>';
+      this.encodingTag = new PollyTag(name, 'break', pre, post);
     }
     if (name === 'emphasis') {
-      const pre = '<emphasis level="' + this.emphasisMode + '">';
+      const pre = '<emphasis level="' + this.emphasisConfig.emphasisMode + '">';
       const post = '</emphasis>';
-      this.encodingTag = new PollyTag(name, '9175e0', pre, post);
+      this.encodingTag = new PollyTag(name, 'emphasis', pre, post);
     }
     if (name === 'prosody') {
       let pre = '<prosody';
-      if (this.volumeDefaultCheck === false) {
-        pre = pre + ' volume="' + this.volumeValue + '"';
-      }
-      if (this.rateDefaultCheck === false) {
-        pre = pre + ' rate="' + this.rateValue  + '"';
-      }
-      if (this.pitchDefaultCheck === false) {
-        pre = pre + ' pitch="' + this.pitchValue  + '"';
-      }
+      //if (this.prosodyConfig.volumeDefaultCheck === false) {
+        pre = pre + ' volume="' + this.prosodyConfig.volumeValue + '"';
+      //}
+      //if (this.prosodyConfig.rateDefaultCheck === false) {
+        pre = pre + ' rate="' + this.prosodyConfig.rateValue + '"';
+      //}
+      //if (this.prosodyConfig.pitchDefaultCheck === false) {
+        pre = pre + ' pitch="' + this.prosodyConfig.pitchValue + '"';
+      //}
       pre = pre + '>';
       const post = '</prosody>';
-      this.encodingTag = new PollyTag(name, 'c9e075', pre, post);
+      this.encodingTag = new PollyTag(name, 'prosody', pre, post);
     }
+
     this.pollyservice.updateTag(this.encodingTag);
-  }
-
-  /**
-   * Retreieve all AWS Polly voices available for selected language
-   * @param PollyLanguage language selected by user
-   */
-  getVoices(language: PollyLanguage) {
-    this.pollyVoices = [];
-    this.pollyservice.getVoices(language).subscribe(voices =>
-      voices.forEach(element => {
-        this.pollyVoices.push(element);
-      }));
-  }
-
-  /**
-   * Return if the provided voice is currently the selected voice
-   * Useful for CSS manipulation
-   * @param PollyVoice voice to query
-   * @returns string boolean if selected
-   */
-  isVoiceSelected(voice: PollyVoice): string {
-    if (this.selectedVoice === voice.Id) {
-      return 'selectedTrue';
-    }
-    return 'selectedFalse';
   }
 
   /**
@@ -153,36 +279,56 @@ export class ControlComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Update the selected voice
-   * @param PollyVoice selected voice
-   */
-  updateVoice(voice: PollyVoice) {
-    this.selectedVoice = voice.Id;
-    this.pollyservice.updateVoice(voice.Id);
-  }
-
-  /**
-   * Retreive a demo audio clip of the selected voice
-   * @param PollyVoice voice selected by user
-   */
-  play(voice: PollyVoice) {
-    this.pollyservice.getDemo(voice);
-  }
-
-  /**
    * Set the min and max value for break slider based upon which mode is selected (s/ms)
    * @param any event
    */
-  breakModeSwitch(event: any) {
-    if (event.value === 's') {
-      this.breakSliderStep = 1;
-      this.breakSliderMin = 0;
-      this.breakSliderMax = 10;
-    } else if (event.value === 'ms') {
-      this.breakSliderStep = 100;
-      this.breakSliderMin = 10;
-      this.breakSliderMax = 10000;
+  breakModeSwitch(mode: string) {
+    if (mode === 's') {
+      this.breakConfig.breakSliderStep = 1;
+      this.breakConfig.breakSliderMin = 0;
+      this.breakConfig.breakSliderMax = 10;
+      this.breakConfig.breakSliderMode = 's';
+    } else if (mode === 'ms') {
+      this.breakConfig.breakSliderStep = 100;
+      this.breakConfig.breakSliderMin = 10;
+      this.breakConfig.breakSliderMax = 10000;
+      this.breakConfig.breakSliderMode = 'ms';
     }
+  }
+
+  changeEmphasis(value: string) {
+    this.emphasisConfig.emphasisMode = value;
+    this.onControlChange(null);
+  }
+
+  openDialog(): void {
+    const dialogRef = this.dialog.open(ClearTagsDialogComponent, {
+      width: '250px'
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      console.log('The dialog was closed');
+    });
+  }
+
+}
+
+@Component({
+  template: '<h1 mat-dialog-title>Clear Tags</h1>' +
+  '<div mat-dialog-content>' +
+    '<p>Are you sure you want to clear all tags?</p>' +
+  '</div>' +
+  '<div mat-dialog-actions>' +
+    '<button mat-button (click)="closeDialog()">Cancel</button>' +
+    '<button mat-button (click)="closeDialog()" cdkFocusInitial>Confirm</button>' +
+  '</div>',
+})
+export class ClearTagsDialogComponent {
+
+  constructor(public dialogRef: MatDialogRef<ClearTagsDialogComponent>) {}
+
+    closeDialog(): void {
+    this.dialogRef.close();
   }
 
 }

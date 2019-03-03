@@ -11,6 +11,7 @@ import { HomeComponent } from './home.component';
 
 import { TextModule } from '@app/text/text.module';
 import { ControlModule } from '@app/control/control.module';
+import { VoicesModule } from '@app/voices/voices.module';
 import { EncodingModule } from '@app/encoding/encoding.module';
 import { SnackbarComponent } from './snackbar/snackbar.component';
 import { PagenotfoundComponent } from './pagenotfound/pagenotfound.component';
@@ -27,6 +28,7 @@ import { PagenotfoundComponent } from './pagenotfound/pagenotfound.component';
     HomeRoutingModule,
     TextModule,
     ControlModule,
+    VoicesModule,
     EncodingModule
   ],
   declarations: [

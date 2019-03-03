@@ -1,9 +1,18 @@
-<div class="container">
-  <mat-card class="text-card" fxLayout="row" fxLayout.xs="column" fxLayout.sm="column" ngClass.xs="fxClass-xs" ngClass.sm="fxClass-sm">
+<mat-horizontal-stepper [linear]="true" (selectionChange)="onStepChange($event)" #stepper>
+  <mat-step>
+    <ng-template matStepLabel>Enter Text</ng-template>
     <app-text></app-text>
+  </mat-step>
+  <mat-step>
+    <ng-template matStepLabel>Paint Text</ng-template>
     <app-control></app-control>
-  </mat-card>
-  <mat-card class="encoding-card" fxLayout="row" fxLayout.xs="row" fxLayout.sm="row" ngClass.sm="fxClass-sm">
-      <app-encoding fxLayout="row"></app-encoding>
-  </mat-card>
-</div>
+  </mat-step>
+  <mat-step>
+    <ng-template matStepLabel>Choose Voice</ng-template>
+    <app-voices></app-voices>
+  </mat-step>
+  <mat-step>
+    <ng-template matStepLabel>Playback</ng-template>
+    <app-encoding></app-encoding>
+  </mat-step>
+</mat-horizontal-stepper>

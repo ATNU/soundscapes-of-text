@@ -10,13 +10,15 @@ export class PollyVoice {
     private _LanguageCode: string;
     private _LanguageName: string;
     private _Name: string;
+    private _Icon: string;
 
-    constructor(gender: string, id: string, languageCode: string, languageName: string, name: string) {
+    constructor(gender: string, id: string, languageCode: string, languageName: string, name: string, icon: string) {
         this._Gender = gender;
         this._Id = id;
         this._LanguageCode = languageCode;
         this._LanguageName = languageName;
         this._Name = name;
+        this._Icon = icon;
     }
 
     public get Gender(): string {
@@ -59,4 +61,11 @@ export class PollyVoice {
         this._Name = name;
     }
 
+    public get Icon(): string {
+        return this._Icon;
+    }
+
+    public set Icon(icon: string) {
+        this._Icon = icon;
+    }
 }

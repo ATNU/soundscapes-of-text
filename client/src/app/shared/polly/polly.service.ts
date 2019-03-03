@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, OnInit } from '@angular/core';
 import { Observable, of, Subject } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
@@ -8,12 +8,13 @@ import { SnackbarComponent } from '@app/home/snackbar/snackbar.component';
 import { PollyVoice } from '@app/shared/polly/polly-voice';
 import { PollyLanguage } from '@app/shared/polly/polly-language';
 import { PollyTag } from '@app/shared/polly/polly-tag';
-
+import { environment } from '@env/environment';
+import { PollySelection } from './polly-selection';
 
 @Injectable({
   providedIn: 'root'
 })
-export class PollyService {
+export class PollyService implements OnInit {
 
   private voicesUrl = '/voices';
   private demoUrl = '/demo';
@@ -22,24 +23,30 @@ export class PollyService {
   private encodingText = new Subject<string>();
   private encodingVoice = new Subject<string>();
   private encodingTag = new Subject<PollyTag>();
+  private encodingSelections = new Subject<PollySelection[]>();
 
   private encodingVoiceValue: string;
 
   encodingTextUpdate$ = this.encodingText.asObservable();
   encodingVoiceUpdate$ = this.encodingVoice.asObservable();
   encodingTagUpdate$ = this.encodingTag.asObservable();
+  encodingSelections$ = this.encodingSelections.asObservable();
 
   constructor(
     private http: HttpClient,
     public snackBar: MatSnackBar
   ) {}
 
+  ngOnInit() {
+    this.encodingText.next(localStorage.getItem('encodingText'));
+  }
 
   /**
    * Provide observable with newly received encoding text
    * @param string text to encode
    */
   updateText(encodingText: string) {
+    localStorage.setItem('encodingText', encodingText);
     this.encodingText.next(encodingText);
   }
 
@@ -58,6 +65,14 @@ export class PollyService {
    */
   updateTag(encodingTag: PollyTag) {
     this.encodingTag.next(encodingTag);
+  }
+
+  /**
+   * Provide observable with newly received encoding tag
+   * @param PollyTag ssml tag to be painted
+   */
+  updateSelections(selections: PollySelection[]) {
+    this.encodingSelections.next(selections);
   }
 
   /**
@@ -81,7 +96,8 @@ export class PollyService {
    */
   getDemo(voice: PollyVoice) {
     const audio = new Audio();
-    audio.src = `${this.demoUrl}/${voice.Id}`; // This overrides any http prefix intercepting unfortunately
+    // This overrides any http prefix intercepting unfortunately
+    audio.src = `${environment.serverUrl}${this.demoUrl}/${voice.Id}`;
     audio.load();
     audio.play();
   }

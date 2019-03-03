@@ -1,7 +1,9 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { VgAPI } from 'videogular2/core';
 import { PollyService } from '@app/shared/polly/polly.service';
-import { Subscription } from '../../../node_modules/rxjs';
+import { Subscription, Observable, interval } from 'rxjs';
+import { PollySelection } from '@app/shared/polly/polly-selection';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-encoding',
@@ -15,35 +17,36 @@ export class EncodingComponent implements OnInit, OnDestroy {
 
   encodingTextSubscription: Subscription;
   encodingVoiceSubscription: Subscription;
+  encodingSelectionsSubscription: Subscription;
 
   encodingText: string;
   encodingVoice: string;
+  encodingSelections: PollySelection[];
 
-  progressbarMode: string;
-  progressbarValue: number;
+  generatingEncoding: boolean;
 
-  constructor(private pollyservice: PollyService) {
+  constructor(private pollyservice: PollyService, private http: HttpClient) {
     this.encodingTextSubscription = pollyservice.encodingTextUpdate$.subscribe(encodingText => {
       this.encodingText = encodingText;
     });
     this.encodingVoiceSubscription = pollyservice.encodingVoiceUpdate$.subscribe(encodingVoice => {
       this.encodingVoice = encodingVoice;
     });
+    this.encodingSelectionsSubscription = pollyservice.encodingSelections$.subscribe(encodingSelections => {
+      this.encodingSelections = encodingSelections;
+    });
    }
 
   ngOnInit() {
     this.sources = new Array<Object>();
-    this.sources.push({
-      src: 'https://s3-eu-west-1.amazonaws.com/atnu.soundscapes/bfeeb015-d93f-4961-ae77-61dbdd700e0d.mp3',
-      type: 'audio/mpeg'
-    });
-    this.progressbarMode = 'determinate';
-    this.progressbarValue = 100;
+    this.encodingSelections = new Array<PollySelection>();
+    this.generatingEncoding = true;
   }
 
   ngOnDestroy() {
     this.encodingTextSubscription.unsubscribe();
     this.encodingVoiceSubscription.unsubscribe();
+    this.encodingSelectionsSubscription.unsubscribe();
   }
 
   /**
@@ -66,18 +69,67 @@ export class EncodingComponent implements OnInit, OnDestroy {
    */
   updatePlayerSource() {
     this.progressbarMode = 'indeterminate';
+    this.generatingEncoding = true;
 
-    this.pollyservice.getEncoding(this.encodingText).subscribe(url => {
-      console.log('URL', url);
-      this.api.pause();
-      this.sources = [];
-      this.sources.push({
-        src: url,
-        type: 'audio/mpeg'
+    this.encodingSelections.sort((ls, rs): number => {
+      if (ls.caretStart > rs.caretStart) {
+        return 1;
+      }
+      if (ls.caretStart < rs.caretStart) {
+        return -1;
+      }
+      return 0;
+    });
+
+    let text = String(this.encodingText).replace(/<[^>]+>/gm, '');
+    text = '<speak>' + text + '</speak>';
+    let offset = 7;
+
+    this.encodingSelections.forEach(selection => {
+
+      let tag: string;
+
+      if (selection.tag.name === 'break') {
+        tag = selection.ssml.replace('>', '/>');
+        tag = tag.replace('</break>', '');
+      } else {
+        tag = selection.ssml;
+      }
+
+      text = [
+        text.slice(0, (selection.caretStart + offset)),
+        tag,
+        text.slice(selection.caretEnd + offset)]
+        .join('');
+      offset = offset + selection.litter;
+    });
+
+    this.pollyservice.getEncoding(text).subscribe(url => {
+
+      const source = interval(5000);
+
+      const subscribe = source.subscribe(val => {
+        this.http.get(url.toString()).subscribe(
+          data => {
+            console.log('success', data);
+            this.generatingEncoding = false;
+            subscribe.unsubscribe();
+          },
+          response => {
+            if (response.status === 200) {
+              this.api.pause();
+              this.sources = [];
+              this.sources.push({
+                src: url,
+                type: 'audio/mpeg'
+              });
+              this.api.currentTime = 0;
+              this.generatingEncoding = false;
+              subscribe.unsubscribe();
+            }
+          }
+        );
       });
-      this.api.currentTime = 0;
-      this.progressbarMode = 'determinate';
-      this.progressbarValue = 100;
     });
   }
 
