@@ -8,8 +8,8 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-voices',
-  templateUrl: './Voices.component.html',
-  styleUrls: ['./Voices.component.scss']
+  templateUrl: './voices.component.html',
+  styleUrls: ['./voices.component.scss']
 })
 export class VoicesComponent implements OnInit, OnDestroy {
 
