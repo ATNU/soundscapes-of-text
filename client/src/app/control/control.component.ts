@@ -249,13 +249,13 @@ export class ControlComponent implements OnInit, OnDestroy {
     if (name === 'prosody') {
       let pre = '<prosody';
       //if (this.prosodyConfig.volumeDefaultCheck === false) {
-        pre = pre + ' volume="' + this.prosodyConfig.volumeValue + '"';
+        pre = pre + ' volume="' + this.prosodyConfig.volumeValue + 'dB"';
       //}
       //if (this.prosodyConfig.rateDefaultCheck === false) {
-        pre = pre + ' rate="' + this.prosodyConfig.rateValue + '"';
+        pre = pre + ' rate="' + this.prosodyConfig.rateValue + '%"';
       //}
       //if (this.prosodyConfig.pitchDefaultCheck === false) {
-        pre = pre + ' pitch="' + this.prosodyConfig.pitchValue + '"';
+        pre = pre + ' pitch="' + this.prosodyConfig.pitchValue + '%"';
       //}
       pre = pre + '>';
       const post = '</prosody>';
