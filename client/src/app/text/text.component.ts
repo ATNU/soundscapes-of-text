@@ -40,6 +40,7 @@ export class TextComponent implements OnInit {
 
   updateText(oField: any) {
     this.pollyservice.updateText(this.encodingText);
+    this.pollyservice.updateSelections(new Array<PollySelection>());
   }
 
   onChange(deviceValue: TextPreset) {

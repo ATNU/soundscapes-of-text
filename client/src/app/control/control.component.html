@@ -11,7 +11,7 @@
           <button [ngClass]="{'selected': currentTag === 'prosody'}" mat-button (click)="updateEncodingTag($event,'prosody')">
             <mat-icon>record_voice_over</mat-icon> Prosody
           </button>
-          <button [ngClass]="{'selected': currentTag === 'eraser'}" mat-button (click)="openDialog()">
+          <button [ngClass]="{'selected': currentTag === 'eraser'}" mat-button (click)="resetTags()">
             <mat-icon>delete</mat-icon> Clear
           </button>
         </mat-toolbar>

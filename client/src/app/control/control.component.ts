@@ -65,7 +65,7 @@ export class ControlComponent implements OnInit, OnDestroy {
     });
     this.encodingTextSubscription = pollyservice.encodingTextUpdate$.subscribe(encodingText => {
       this.encodingText = encodingText;
-      this.addTags();
+      this.resetTags();
     });
   }
 
@@ -299,6 +299,12 @@ export class ControlComponent implements OnInit, OnDestroy {
   changeEmphasis(value: string) {
     this.emphasisConfig.emphasisMode = value;
     this.onControlChange(null);
+  }
+
+  resetTags(): void {
+    this.selections = new Array<PollySelection>();
+    this.pollyservice.updateSelections(this.selections);
+    this.addTags();
   }
 
   openDialog(): void {
