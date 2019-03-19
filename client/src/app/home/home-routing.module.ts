@@ -6,7 +6,7 @@ import { HomeComponent } from './home.component';
 
 const routes: Routes = [
   Route.withShell([
-    { path: '', component: HomeComponent, data: { title: extract('Home') } }
+    { path: '', component: HomeComponent, data: { title: extract('Soundscapes of Text') } }
   ])
 ];
 
