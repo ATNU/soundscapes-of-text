@@ -3,8 +3,8 @@ workflows:
   soundscapes-of-text-server:
     jobs:
       - build:
-          docker:
-            - image: circleci/golang:1.12
+        docker:
+          - image: circleci/golang:1.12
           working_directory: /go/src/github.com/ATNU/soundscapes-of-text/server
 
           steps:
