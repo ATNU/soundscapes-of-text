@@ -7,12 +7,8 @@ jobs: # basic units of work in a run
     # directory where steps are run. Path must conform to the Go Workspace requirements
     working_directory: /go/src/github.com/CircleCI-Public/circleci-demo-go
 
-    environment: # environment variables for the build itself
-      TEST_RESULTS: /tmp/test-results # path to where test results will be saved
-
     steps: # steps that comprise the `build` job
       - checkout # check out source code to working directory
-      - run: mkdir -p $TEST_RESULTS # create the test results directory
 
       - restore_cache: # restores saved cache if no changes are detected since last run
       # Read about caching dependencies: https://circleci.com/docs/2.0/caching/
@@ -28,6 +24,8 @@ jobs: # basic units of work in a run
       - run: go get github.com/aws/aws-sdk-go/service/polly
       - run: go get github.com/aws/aws-sdk-go/aws
       - run: go get github.com/aws/aws-sdk-go/service/polly/pollyiface
+
+      - run: CGO_ENABLED=0 GOOS=linux go build -a -installsuffix nocgo -o /app .
 
       - save_cache: # Store cache in the /go/pkg directory
           key: v1-pkg-cache
