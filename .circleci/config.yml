@@ -1,9 +1,9 @@
 workflows:
   version: 2
-  soundscapes-of-text-server:
+  untagged-build:
     jobs:
       - build
-      
+
 #    jobs:
 #      - build:
 #        docker:
