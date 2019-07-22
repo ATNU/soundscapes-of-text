@@ -49,7 +49,7 @@ jobs:
                 docker_layer_caching:
 
       - run: |
-          cd .. && docker build -t rsenu.azurecr.io/soundscapes-of-text-server:latest -t rsenu.azurecr.io/soundscapes-of-text-server:$CIRCLE_SHA1 .
+          cd .. && docker build -f server/Dockerfile -t rsenu.azurecr.io/soundscapes-of-text-server:latest -t rsenu.azurecr.io/soundscapes-of-text-server:$CIRCLE_SHA1 .
           docker login -u $DOCKER_USER -p $DOCKER_PASS rsenu.azurecr.io
           docker push rsenu.azurecr.io/soundscapes-of-text-server:latest
           docker push rsenu.azurecr.io/soundscapes-of-text-server:$CIRCLE_SHA1
