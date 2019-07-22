@@ -1,36 +1,52 @@
-version: 2.0
+version: 2
 
 jobs:
-  build-server:
+  build:
     docker:
-      - image: circleci/golang:1.12
-    working_directory: /go/src/github.com/ATNU/soundscapes-of-text/server
-
+      - image: circleci/golang
+    environment:
+      O: "ATNU"
+      R: "soundscapes-of-text"
     steps:
-      - checkout:
-          path: /go/src/github.com/ATNU/soundscapes-of-text
+      - checkout
+      - run:
+          name: Determine which directories have changed
+          command: |
+            git diff --no-commit-id --name-only -r `git log -n 2 --oneline --pretty=format:"%h" | tail -n1` | cut -d/ -f1 | sort -u >  projects
+            printf "Modified directories:\n"
+            cat projects
+            while read project; do
+              if grep -Fxq $project projects.txt; then
+                printf "\nTriggerring build for dir: "$dir
+                curl -s -u ${CIRCLE_TOKEN}: \
+                  -d build_parameters[CIRCLE_JOB]=${project} \                https://circleci.com/api/v1.1/project/github/$O/$R/tree/$CIRCLE_BRANCH
+              fi
+            done <projects
 
-      - restore_cache:
-          keys:
-            - v1-pkg-cache
+server:
+  docker:
+    - image: circleci/golang:1.12
+  working_directory: /go/src/github.com/ATNU/soundscapes-of-text/server
 
-      - run: go get github.com/spf13/viper
-      - run: go get github.com/gorilla/mux
-      - run: go get github.com/fsnotify/fsnotify
-      - run: go get github.com/aws/aws-sdk-go/aws/session
-      - run: go get github.com/aws/aws-sdk-go/service/polly
-      - run: go get github.com/aws/aws-sdk-go/aws
-      - run: go get github.com/aws/aws-sdk-go/service/polly/pollyiface
+  steps:
+    - checkout:
+        path: /go/src/github.com/ATNU/soundscapes-of-text
 
-      - run: CGO_ENABLED=0 GOOS=linux go build -a -installsuffix nocgo -o app .
+    - restore_cache:
+        keys:
+          - v1-pkg-cache
 
-      - save_cache:
-          key: v1-pkg-cache
-          paths:
-            - "/go/pkg"
-workflows:
-  version: 2
-  untagged-build:
-    jobs:
-      - build-server
+    - run: go get github.com/spf13/viper
+    - run: go get github.com/gorilla/mux
+    - run: go get github.com/fsnotify/fsnotify
+    - run: go get github.com/aws/aws-sdk-go/aws/session
+    - run: go get github.com/aws/aws-sdk-go/service/polly
+    - run: go get github.com/aws/aws-sdk-go/aws
+    - run: go get github.com/aws/aws-sdk-go/service/polly/pollyiface
 
+    - run: CGO_ENABLED=0 GOOS=linux go build -a -installsuffix nocgo -o app .
+
+    - save_cache:
+        key: v1-pkg-cache
+        paths:
+          - "/go/pkg"
