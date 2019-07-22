@@ -45,11 +45,6 @@ jobs:
 
       - run: CGO_ENABLED=0 GOOS=linux go build -a -installsuffix nocgo -o app .
 
-      - save_cache:
-          key: v1-pkg-cache
-          paths:
-            - "/go/pkg"
-
       - setup_remote_docker:
                 docker_layer_caching:
 
@@ -58,6 +53,12 @@ jobs:
           docker login -u $DOCKER_USER -p $DOCKER_PASS rsenu.azurecr.io
           docker push rsenu.azurecr.io/soundscapes-of-text-server:latest
           docker push rsenu.azurecr.io/soundscapes-of-text-server:$CIRCLE_SHA1
+
+      - save_cache:
+          key: v1-pkg-cache
+          paths:
+            - "/go/pkg"
+
 
 
 
@@ -78,18 +79,19 @@ jobs:
         - run: npm install
         - run: npm rebuild node-sass
         - run: npm run build -- --output-path=./dist/out --configuration production
+        
+        - setup_remote_docker:
+                  docker_layer_caching:
+
+        - run: |
+            docker build -t rsenu.azurecr.io/soundscapes-of-text-client:latest -t rsenu.azurecr.io/soundscapes-of-text-client:$CIRCLE_SHA1 .
+            docker login -u $DOCKER_USER -p $DOCKER_PASS rsenu.azurecr.io
+            docker push rsenu.azurecr.io/soundscapes-of-text-client:latest
+            docker push rsenu.azurecr.io/soundscapes-of-text-client:$CIRCLE_SHA1
 
         - save_cache:
             paths:
               - node_modules
             key: v1-dependencies-{{ checksum "package.json" }}
-            
-      - setup_remote_docker:
-                docker_layer_caching:
 
-      - run: |
-          docker build -t rsenu.azurecr.io/soundscapes-of-text-client:latest -t rsenu.azurecr.io/soundscapes-of-text-client:$CIRCLE_SHA1 .
-          docker login -u $DOCKER_USER -p $DOCKER_PASS rsenu.azurecr.io
-          docker push rsenu.azurecr.io/soundscapes-of-text-client:latest
-          docker push rsenu.azurecr.io/soundscapes-of-text-client:$CIRCLE_SHA1
 
