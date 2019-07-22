@@ -25,7 +25,6 @@ jobs:
       #- run: go get -v -t -d ./...
       #- run: go test -v ./...
 
-      - run: apk update && apk add ca-certificates git && rm -rf /var/cache/apk/*
       - run: go get github.com/spf13/viper && \
               go get github.com/gorilla/mux && \
               go get github.com/fsnotify/fsnotify && \
