@@ -21,7 +21,7 @@ func SetupConfig() {
 	if err != nil {
 		log.Fatal("Failed to find configuration file")
 	}
-	log.Println("Successfully found configuration file" + cfgName)
+	log.Println("Successfully found configuration file - test deploy to Azure" + cfgName)
 
 	viper.WatchConfig()
 	viper.OnConfigChange(func(e fsnotify.Event) {
