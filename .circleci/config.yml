@@ -26,7 +26,7 @@ jobs: # basic units of work in a run
       - run: go get github.com/aws/aws-sdk-go/service/polly/pollyiface
       - run: ls $CIRCLE_WORKING_DIRECTORY
       - run: ls $PWD
-      - run: ls ~/go
+      - run: ls /go
 
       #- run: CGO_ENABLED=0 GOOS=linux go build -a -installsuffix nocgo -o /app .
       - run: make
