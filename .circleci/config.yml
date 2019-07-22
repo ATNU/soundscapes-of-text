@@ -9,8 +9,7 @@ jobs:
       R: "soundscapes-of-text"
     steps:
       - checkout
-      - run:
-        command: echo ${CIRCLE_TOKEN}
+      - run: echo ${CIRCLE_TOKEN}
       - run:
           name: Determine which directories have changed
           command: |
