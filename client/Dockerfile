@@ -10,6 +10,8 @@ COPY ./client /app/
 
 ARG configuration=production
 
+RUN npm rebuild node-sass
+
 RUN npm run build -- --output-path=./dist/out --configuration $configuration
 
 
