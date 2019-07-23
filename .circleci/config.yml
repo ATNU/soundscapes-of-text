@@ -64,7 +64,7 @@ jobs:
 
   client:
       docker:
-        - image: circleci/node:10
+        - image: circleci/node:8
       working_directory: ~/repo/client
 
       steps:
