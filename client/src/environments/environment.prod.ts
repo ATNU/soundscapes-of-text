@@ -4,7 +4,7 @@ import env from './.env';
 export const environment = {
   production: true,
   version: env.npm_package_version,
-  serverUrl: 'http://soundscapes.atnu.di-projects.net',
+  serverUrl: 'https://soundscapes-of-text-server.azurewebsites.net',
   defaultLanguage: 'en-US',
   supportedLanguages: [
     'en-US',
