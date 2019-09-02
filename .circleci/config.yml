@@ -49,10 +49,10 @@ jobs:
                 docker_layer_caching:
 
       - run: |
-          cd .. && docker build -f server/Dockerfile -t rsenu.azurecr.io/soundscapes-of-text-server:latest -t rsenu.azurecr.io/soundscapes-of-text-server:$CIRCLE_SHA1 .
-          docker login -u $DOCKER_USER -p $DOCKER_PASS rsenu.azurecr.io
-          docker push rsenu.azurecr.io/soundscapes-of-text-server:latest
-          docker push rsenu.azurecr.io/soundscapes-of-text-server:$CIRCLE_SHA1
+          cd .. && docker build -f server/Dockerfile -t rsenuatnu.azurecr.io/soundscapes-of-text-server:latest -t rsenuatnu.azurecr.io/soundscapes-of-text-server:$CIRCLE_SHA1 .
+          docker login -u $DOCKER_USER -p $DOCKER_PASS rsenuatnu.azurecr.io
+          docker push rsenuatnu.azurecr.io/soundscapes-of-text-server:latest
+          docker push rsenuatnu.azurecr.io/soundscapes-of-text-server:$CIRCLE_SHA1
 
       - save_cache:
           key: v1-pkg-cache
@@ -84,10 +84,10 @@ jobs:
                   docker_layer_caching:
 
         - run: |
-            cd .. && docker build -f client/Dockerfile -t rsenu.azurecr.io/soundscapes-of-text-client:latest -t rsenu.azurecr.io/soundscapes-of-text-client:$CIRCLE_SHA1 .
-            docker login -u $DOCKER_USER -p $DOCKER_PASS rsenu.azurecr.io
-            docker push rsenu.azurecr.io/soundscapes-of-text-client:latest
-            docker push rsenu.azurecr.io/soundscapes-of-text-client:$CIRCLE_SHA1
+            cd .. && docker build -f client/Dockerfile -t rsenuatnu.azurecr.io/soundscapes-of-text-client:latest -t rsenuatnu.azurecr.io/soundscapes-of-text-client:$CIRCLE_SHA1 .
+            docker login -u $DOCKER_USER -p $DOCKER_PASS rsenuatnu.azurecr.io
+            docker push rsenuatnu.azurecr.io/soundscapes-of-text-client:latest
+            docker push rsenuatnu.azurecr.io/soundscapes-of-text-client:$CIRCLE_SHA1
 
         - save_cache:
             paths:
