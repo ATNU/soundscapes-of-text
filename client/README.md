@@ -119,3 +119,4 @@ Development, build and quality processes are based on [angular-cli](https://gith
 - [ngx-translate](https://github.com/ngx-translate/core)
 - [Lodash](https://lodash.com)
 - [Videogular](http://www.videogular.com/)
+
