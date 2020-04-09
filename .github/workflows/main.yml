@@ -15,7 +15,7 @@ jobs:
     - name: Publish Client to Registry
       uses: elgohr/Publish-Docker-Github-Action@master
       with:
-        workdir: client
+        dockerfile: client/Dockerfile
         registry: atnuregistry.azurecr.io
         name: atnuregistry.azurecr.io/soundscapes-of-text-client
         username: ${{ secrets.REGISTRY_USERNAME }}
@@ -24,7 +24,7 @@ jobs:
     - name: Publish Server to Registry
       uses: elgohr/Publish-Docker-Github-Action@master
       with:
-        workdir: server
+        dockerfile: server/Dockerfile
         registry: atnuregistry.azurecr.io
         name: atnuregistry.azurecr.io/soundscapes-of-text-server
         username: ${{ secrets.REGISTRY_USERNAME }}
