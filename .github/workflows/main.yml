@@ -1,0 +1,32 @@
+# This workflow will do a clean install of python dependencies, run tests, build the docker images and deploy to Azure Container Instances
+
+name: Build & Deploy
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build-client:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v2
+    - name: Publish Client to Registry
+      uses: elgohr/Publish-Docker-Github-Action@master
+      with:
+        workdir: client
+        registry: atnuregistry.azurecr.io
+        name: atnuregistry.azurecr.io/soundscapes-of-text-client
+        username: ${{ secrets.REGISTRY_USERNAME }}
+        password: ${{ secrets.REGISTRY_PASSWORD }}
+        tag_semver: true
+    - name: Publish Server to Registry
+      uses: elgohr/Publish-Docker-Github-Action@master
+      with:
+        workdir: server
+        registry: atnuregistry.azurecr.io
+        name: atnuregistry.azurecr.io/soundscapes-of-text-server
+        username: ${{ secrets.REGISTRY_USERNAME }}
+        password: ${{ secrets.REGISTRY_PASSWORD }}
+        tag_semver: true
