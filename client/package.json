@@ -35,7 +35,7 @@
     "hammerjs": "^2.0.8",
     "hoek": "^5.0.4",
     "jshint": "^2.9.6",
-    "lodash": "^4.17.11",
+    "lodash": "^4.17.19",
     "material-design-icons-iconfont": "^3.0.3",
     "ngx-editor": "^3.3.0",
     "ngx-quill": "^3.3.0",
